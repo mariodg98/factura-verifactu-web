@@ -550,8 +550,8 @@
         </nav>
 
         <div class="nav-actions">
-            <a href="app.html" class="btn btn-outline">Iniciar Sesión</a>
-            <a href="app.html" class="btn btn-primary">Probar 15 días gratis</a>
+            <a href="login.html?mode=login" class="btn btn-outline">Iniciar Sesión</a>
+            <a href="login.html" class="btn btn-primary">Probar 15 días gratis</a>
         </div>
     </div>
 </header>
@@ -583,7 +583,7 @@
                 </ul>
 
                 <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                    <a href="app.html" class="btn btn-primary btn-lg">Empezar Prueba Gratis de 15 Días &rarr;</a>
+                    <a href="login.html" class="btn btn-primary btn-lg">Empezar Prueba Gratis de 15 Días &rarr;</a>
                     <a href="#precios" class="btn btn-outline btn-lg">Ver Oferta Pre-1 de Enero (39 €/año)</a>
                 </div>
                 <div style="margin-top:10px; font-size:12.5px; color:var(--text-muted);">
@@ -764,7 +764,7 @@
                 </div>
 
                 <div>
-                    <a href="app.html?plan=single" class="btn btn-primary" style="width:100%; margin-bottom:8px;">Empezar 15 Días Gratis (Plan 1 NIF) &rarr;</a>
+                    <a href="login.html?plan=single" class="btn btn-primary" style="width:100%; margin-bottom:8px;">Empezar 15 Días Gratis (Plan 1 NIF) &rarr;</a>
                     <a href="activar.html?plan=39" id="p1BuyLink" class="btn btn-outline" style="width:100%; font-size:13px;">O contratar directamente la Oferta de 39 €/año</a>
                 </div>
             </div>
@@ -794,7 +794,7 @@
                 </div>
 
                 <div>
-                    <a href="app.html?plan=multi" class="btn btn-primary" style="width:100%; margin-bottom:8px; background:#0f172a;">Probar Edición Multi-NIF 15 Días Gratis &rarr;</a>
+                    <a href="login.html?plan=multi" class="btn btn-primary" style="width:100%; margin-bottom:8px; background:#0f172a;">Probar Edición Multi-NIF 15 Días Gratis &rarr;</a>
                     <a href="activar.html?plan=99" id="p2BuyLink" class="btn btn-outline" style="width:100%; font-size:13px;">O contratar directamente la Oferta de 99 €/año</a>
                 </div>
             </div>
@@ -853,6 +853,13 @@
 </footer>
 
 <script>
+(function captureAffiliateOnLanding() {
+    var params = new URLSearchParams(window.location.search);
+    var ref = params.get('ref');
+    if (ref) {
+        localStorage.setItem('vf_affiliate_ref', ref.trim());
+    }
+})();
 function setBillingMode(mode) {
     var bAnn = document.getElementById('btnBillingAnnual');
     var bMon = document.getElementById('btnBillingMonthly');
