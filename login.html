@@ -267,9 +267,9 @@
 </footer>
 
 <script>
-// Configuración opcional Supabase Cloud (si está configurada sincroniza en la nube; si no, funciona al instante con sesión autenticada local)
-var SUPABASE_URL = localStorage.getItem('vf_supabase_url') || '';
-var SUPABASE_ANON_KEY = localStorage.getItem('vf_supabase_key') || '';
+// Configuración oficial Supabase Cloud de Factura-VeriFactu.es
+var SUPABASE_URL = 'https://tbxjgigjmakgpogotgjr.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_NCGpWz9PyR5JfsYrSaQx8Q_PO5H2Swz';
 var supabaseClient = null;
 if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
     try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) {}
@@ -325,14 +325,39 @@ async function handleRegister(e) {
         logged_at: now.toISOString()
     };
 
-    // Si Supabase Cloud está conectado, registra también en PostgreSQL/Auth
+    // Conectar y registrar en Supabase Cloud (PostgreSQL + Auth)
     if (supabaseClient) {
         try {
-            await supabaseClient.auth.signUp({
+            var signRes = await supabaseClient.auth.signUp({
                 email: email,
                 password: pass,
                 options: { data: { nombre_titular: name, nif_cif: nif, plan_tipo: plan, codigo_afiliado_origen: ref } }
             });
+            var uid = (signRes.data && signRes.data.user) ? signRes.data.user.id : null;
+            if (uid) {
+                userSession.user_id = uid;
+                await supabaseClient.from('perfiles_cuenta').upsert({
+                    id: uid,
+                    email: email,
+                    nombre_titular: name,
+                    plan_tipo: plan,
+                    estado_suscripcion: 'trial_15d',
+                    codigo_afiliado_origen: ref
+                });
+                var empIns = await supabaseClient.from('empresas_emisoras').insert({
+                    user_id: uid,
+                    razon_social: name,
+                    nif_cif: nif,
+                    email_facturacion: email,
+                    direccion_fiscal: 'Dirección Fiscal Pendiente de Completar',
+                    ciudad_cp: 'España',
+                    iban_cobros: 'ES00 0000 0000 0000 0000 0000',
+                    nif_bloqueado: true
+                }).select().single();
+                if (empIns.data && empIns.data.id) {
+                    userSession.empresa_uuid = empIns.data.id;
+                }
+            }
         } catch(err) {}
     }
 
