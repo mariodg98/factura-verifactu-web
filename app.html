@@ -847,6 +847,7 @@
                         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                         Ajustes
                     </button>
+                    <button type="button" class="mobile-icon-btn" onclick="logoutUserSession()">Salir</button>
                 </div>
             </div>
             <div class="mobile-nif-row">
@@ -865,7 +866,7 @@
                 <span id="userEmailBadge" style="font-size:12px; color:var(--text-muted); font-weight:500;"></span>
                 <button class="btn btn-outline" onclick="openSection('presupuestos')">Nuevo Presupuesto</button>
                 <button class="btn btn-primary" onclick="openSection('facturas'); showNewInvoiceForm();">+ Nueva Factura VeriFactu</button>
-                <a href="login.html?mode=login" class="btn btn-outline" style="padding:7px 10px; font-size:12px;" title="Cambiar de cuenta">Cuenta</a>
+                <button type="button" class="btn btn-outline" style="padding:7px 10px; font-size:12px;" onclick="logoutUserSession()" title="Cerrar sesión">Salir</button>
             </div>
         </div>
 
@@ -1569,6 +1570,21 @@
 
 <script>
 // ================= CONEXIÓN CLOUD SUPABASE (SINCRONIZACIÓN MÓVIL <-> PC) =================
+(function enforceAuthGuard() {
+    var sess = localStorage.getItem('vf_user_session');
+    if (!sess) {
+        window.location.replace('login.html?mode=login');
+    }
+})();
+
+async function logoutUserSession() {
+    localStorage.removeItem('vf_user_session');
+    if (sbClient) {
+        try { await sbClient.auth.signOut(); } catch(e) {}
+    }
+    window.location.href = 'login.html?mode=login';
+}
+
 var SUPABASE_URL = 'https://tbxjgigjmakgpogotgjr.supabase.co';
 var SUPABASE_ANON_KEY = 'sb_publishable_NCGpWz9PyR5JfsYrSaQx8Q_PO5H2Swz';
 var sbClient = null;
