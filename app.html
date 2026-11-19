@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-app: #f8fafc;
@@ -1567,6 +1568,103 @@
 </div>
 
 <script>
+// ================= CONEXIÓN CLOUD SUPABASE (SINCRONIZACIÓN MÓVIL <-> PC) =================
+var SUPABASE_URL = 'https://tbxjgigjmakgpogotgjr.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_NCGpWz9PyR5JfsYrSaQx8Q_PO5H2Swz';
+var sbClient = null;
+if (window.supabase) {
+    try { sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) {}
+}
+
+async function syncInvoiceToSupabase(inv) {
+    if (!sbClient) return;
+    try {
+        var sessRes = await sbClient.auth.getSession();
+        var user = (sessRes.data && sessRes.data.session) ? sessRes.data.session.user : null;
+        if (!user) return;
+        var empRes = await sbClient.from('empresas_emisoras').select('id').eq('user_id', user.id).limit(1);
+        var empId = (empRes.data && empRes.data[0]) ? empRes.data[0].id : null;
+        if (!empId) return;
+        await sbClient.from('facturas_verifactu').insert({
+            user_id: user.id,
+            empresa_id: empId,
+            tipo_factura: inv.type || 'F1',
+            factura_rectificada_num: inv.rectOrigin || '',
+            motivo_rectificacion: inv.rectReason || '',
+            serie: inv.serie,
+            correlativo: inv.correlativo,
+            numero_oficial: inv.numero,
+            fecha_expedicion: inv.fecha,
+            cliente_nombre: inv.cliente.name,
+            cliente_nif: inv.cliente.nif,
+            cliente_contacto: inv.cliente.contact || '',
+            cliente_direccion: inv.cliente.address || '',
+            lineas_json: inv.lines,
+            base_imponible: inv.base,
+            iva_porcentaje: inv.ivaPct,
+            cuota_iva: inv.iva,
+            irpf_porcentaje: inv.irpfPct,
+            cuota_irpf: inv.irpf,
+            importe_total: inv.total,
+            prev_hash_sha256: inv.prev_hash,
+            current_hash_sha256: inv.current_hash,
+            estado_aeat: inv.aeat_status,
+            csv_aeat: inv.aeat_csv
+        });
+    } catch(e) {}
+}
+
+async function pullCloudDataFromSupabase() {
+    if (!sbClient) return;
+    try {
+        var sessRes = await sbClient.auth.getSession();
+        var user = (sessRes.data && sessRes.data.session) ? sessRes.data.session.user : null;
+        if (!user) return;
+        var profRes = await sbClient.from('perfiles_cuenta').select('*').eq('id', user.id).single();
+        if (profRes.data && profRes.data.plan_tipo) {
+            localStorage.setItem('vf_cloud_plan_type', profRes.data.plan_tipo);
+            refreshPlanUI();
+        }
+        var invRes = await sbClient.from('facturas_verifactu').select('*').eq('user_id', user.id).order('correlativo', { ascending: true });
+        if (invRes.data && invRes.data.length > 0) {
+            var comp = getActiveCompany();
+            var mapped = invRes.data.map(function(row) {
+                return {
+                    id: 'inv_' + row.id,
+                    type: row.tipo_factura,
+                    rectOrigin: row.factura_rectificada_num,
+                    rectReason: row.motivo_rectificacion,
+                    serie: row.serie,
+                    correlativo: row.correlativo,
+                    numero: row.numero_oficial,
+                    fecha: row.fecha_expedicion,
+                    emisor: comp,
+                    cliente: {
+                        name: row.cliente_nombre,
+                        nif: row.cliente_nif,
+                        contact: row.cliente_contacto,
+                        address: row.cliente_direccion
+                    },
+                    lines: row.lineas_json || [],
+                    base: Number(row.base_imponible),
+                    ivaPct: Number(row.iva_porcentaje),
+                    iva: Number(row.cuota_iva),
+                    irpfPct: Number(row.irpf_porcentaje),
+                    irpf: Number(row.cuota_irpf),
+                    total: Number(row.importe_total),
+                    prev_hash: row.prev_hash_sha256,
+                    current_hash: row.current_hash_sha256,
+                    aeat_status: row.estado_aeat,
+                    aeat_csv: row.csv_aeat
+                };
+            });
+            saveCompanyInvoices(mapped);
+            refreshNextCorrelative();
+            renderAllTables();
+        }
+    } catch(e) {}
+}
+
 // ================= MOTOR CRIPTOGRÁFICO SHA-256 REAL Y QR AEAT =================
 function sha256Real(ascii) {
     function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
@@ -2099,6 +2197,7 @@ function emitVeriFactuInvoice() {
 
     invs.push(newInv);
     saveCompanyInvoices(invs);
+    syncInvoiceToSupabase(newInv);
     refreshNextCorrelative();
     renderAllTables();
     openInvoiceModal(newInv.id);
@@ -2706,6 +2805,7 @@ refreshNextCorrelative();
 renderFormLines();
 renderQuoteLines();
 renderAllTables();
+pullCloudDataFromSupabase();
 if (localStorage.getItem('vf_open_aff') === '1') {
     localStorage.removeItem('vf_open_aff');
     openSection('afiliados');
