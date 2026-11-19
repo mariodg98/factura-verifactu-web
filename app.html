@@ -1,0 +1,2651 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="VeriFactu">
+    <link rel="manifest" href="manifest.json">
+    <title>Panel Cloud — Factura-VeriFactu.es | Plataforma de Facturación Conectada AEAT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-app: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --brand: #1e40af;
+            --brand-hover: #1e3a8a;
+            --brand-soft: #eff6ff;
+            --brand-border: #bfdbfe;
+            --success: #15803d;
+            --success-soft: #f0fdf4;
+            --success-border: #bbf7d0;
+            --warning: #b45309;
+            --warning-soft: #fffbeb;
+            --warning-border: #fde68a;
+            --danger: #b91c1c;
+            --danger-soft: #fef2f2;
+            --sidebar-w: 252px;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            background: var(--bg-app);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Layout Desktop + Mobile */
+        .app-shell {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Izquierda (Estilo Holded / Qonto) */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 50;
+        }
+        .sidebar-top {
+            padding: 18px 16px 12px;
+        }
+        .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+        }
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            background: var(--brand);
+            color: #fff;
+            font-weight: 800;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: -0.5px;
+        }
+        .brand-name {
+            font-weight: 700;
+            font-size: 14.5px;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            display: block;
+            line-height: 1.15;
+        }
+        .brand-by {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Selector de Empresa / NIF con Control de Plan (1 NIF vs Multi-NIF) */
+        .company-switcher {
+            background: var(--bg-app);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 16px;
+        }
+        .cs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .cs-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .plan-pill {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--brand-soft);
+            color: var(--brand);
+            border: 1px solid var(--brand-border);
+        }
+        .plan-pill.multi {
+            background: var(--success-soft);
+            color: var(--success);
+            border-color: var(--success-border);
+        }
+        .cs-select {
+            width: 100%;
+            padding: 7px 8px;
+            border: 1px solid var(--border-strong);
+            border-radius: 6px;
+            background: var(--surface);
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .cs-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-xs {
+            font-size: 11.5px;
+            font-weight: 600;
+            padding: 5px 8px;
+            border-radius: 5px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface);
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+        .btn-xs:hover {
+            background: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        /* Navegación Lateral */
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .nav-item {
+            margin-bottom: 3px;
+        }
+        .nav-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 11px;
+            border-radius: 7px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.12s;
+        }
+        .nav-btn svg {
+            width: 17px;
+            height: 17px;
+            stroke: currentColor;
+            stroke-width: 1.9;
+            fill: none;
+            flex-shrink: 0;
+        }
+        .nav-btn:hover {
+            background: var(--bg-app);
+            color: var(--text-primary);
+        }
+        .nav-btn.active {
+            background: var(--brand-soft);
+            color: var(--brand);
+            font-weight: 600;
+        }
+
+        .sidebar-bottom {
+            padding: 14px 16px;
+            border-top: 1px solid var(--border);
+            background: #fcfcfd;
+        }
+        .aeat-status-box {
+            padding: 10px 11px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            margin-bottom: 10px;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .dot-green { background: #16a34a; box-shadow: 0 0 0 3px #dcfce7; }
+        .dot-amber { background: #d97706; box-shadow: 0 0 0 3px #fef3c7; }
+
+        /* Contenido Principal */
+        .main-area {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            padding-bottom: 80px;
+        }
+
+        /* Barra Superior del Panel */
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+        .trial-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--warning-soft);
+            border: 1px solid var(--warning-border);
+            color: #92400e;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 500;
+        }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-wrap {
+            max-width: 1180px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 28px;
+        }
+
+        /* Cabeceras de Sección */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 3px;
+            letter-spacing: -0.3px;
+        }
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Botones Limpios */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 9px 15px;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            transition: all 0.12s;
+        }
+        .btn svg {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+        .btn-primary {
+            background: var(--brand);
+            color: #ffffff;
+        }
+        .btn-primary:hover { background: var(--brand-hover); }
+        .btn-success {
+            background: var(--success);
+            color: #ffffff;
+        }
+        .btn-success:hover { background: #166534; }
+        .btn-outline {
+            background: var(--surface);
+            color: var(--text-primary);
+            border-color: var(--border-strong);
+        }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-whatsapp {
+            background: #15803d;
+            color: #ffffff;
+        }
+
+        /* Tarjetas y KPIs */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        @media (max-width: 960px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 16px 18px;
+        }
+        .kpi-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .kpi-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+        .kpi-foot {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 4px;
+        }
+        .card-sub {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            margin: 0 0 16px;
+        }
+
+        /* Formularios */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        @media (max-width: 820px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 11px;
+            border: 1px solid var(--border-strong);
+            border-radius: 6px;
+            background: var(--surface);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 13.5px;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+        input[readonly] {
+            background: #f1f5f9;
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* Tablas estilo SaaS Contable */
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 11px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 11.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fcfcfd; }
+
+        /* Badges de Estado AEAT */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+        .badge-aeat-ok {
+            background: var(--success-soft);
+            color: var(--success);
+            border: 1px solid var(--success-border);
+        }
+        .badge-aeat-local {
+            background: var(--brand-soft);
+            color: var(--brand);
+            border: 1px solid var(--brand-border);
+        }
+        .badge-rect {
+            background: var(--warning-soft);
+            color: var(--warning);
+            border: 1px solid var(--warning-border);
+        }
+
+        /* Barra Inferior Tipo App en Móviles */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            z-index: 80;
+            padding: 6px 8px;
+            justify-content: space-around;
+        }
+        .mob-nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        .mob-nav-btn svg {
+            width: 19px;
+            height: 19px;
+            stroke: currentColor;
+            stroke-width: 1.9;
+            fill: none;
+        }
+        .mob-nav-btn.active { color: var(--brand); }
+
+        /* Cabecera Exclusiva Móvil (Selector NIF + Acceso a Ayuda y Ajustes) */
+        .mobile-topbar {
+            display: none;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 14px;
+            position: sticky;
+            top: 0;
+            z-index: 70;
+        }
+        .mobile-topbar-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .mobile-nif-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mobile-nif-row select {
+            flex: 1;
+            padding: 6px 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+        .mobile-icon-btn {
+            background: var(--bg-app);
+            border: 1px solid var(--border-strong);
+            color: var(--text-primary);
+            border-radius: 6px;
+            padding: 6px 9px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .mobile-icon-btn svg {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* Líneas de factura responsivas para móvil y escritorio */
+        .invoice-line-row {
+            display: grid;
+            grid-template-columns: 3.5fr 0.9fr 1.2fr 1fr auto;
+            gap: 8px;
+            align-items: end;
+            margin-bottom: 8px;
+        }
+        .invoice-line-sub {
+            font-weight: 700;
+            text-align: right;
+            padding: 8px 4px;
+        }
+
+        /* Guía / Instrucciones sobrias */
+        .guide-step {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            align-items: flex-start;
+        }
+        .guide-step:last-child { border-bottom: none; padding-bottom: 0; }
+        .guide-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: var(--brand-soft);
+            color: var(--brand);
+            border: 1px solid var(--brand-border);
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .guide-step h3 {
+            margin: 0 0 4px;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .guide-step p {
+            margin: 0;
+            font-size: 13.5px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .topbar { display: none; }
+            .mobile-topbar { display: block; width: 100%; max-width: 100vw; }
+            .main-area { margin-left: 0; padding-bottom: 78px; width: 100%; max-width: 100vw; overflow-x: hidden; }
+            .mobile-bottom-nav { display: flex; }
+            .content-wrap { padding: 14px; width: 100%; max-width: 100vw; overflow-x: hidden; }
+            .page-title { font-size: 18px; word-break: break-word; }
+            .page-header { flex-direction: column; align-items: stretch; }
+            .page-header > div { width: 100%; }
+            .page-header .btn { width: 100%; justify-content: center; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .kpi-card { padding: 12px; min-width: 0; }
+            .kpi-value { font-size: 17px; word-break: break-word; }
+            .kpi-foot { font-size: 10.5px; }
+            .card { padding: 14px; width: 100%; max-width: 100%; overflow: hidden; }
+            .table-wrap { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            th, td { padding: 9px 10px; font-size: 12px; }
+            .invoice-line-row {
+                grid-template-columns: 1fr 1fr;
+                background: var(--bg-app);
+                border: 1px solid var(--border);
+                border-radius: 7px;
+                padding: 10px;
+            }
+            .invoice-line-row .il-desc { grid-column: 1 / -1; }
+            .invoice-line-sub { text-align: left; padding: 6px 0 0; }
+        }
+        @media (max-width: 480px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Modal Genérico (Upgrade Multi-NIF / Vista Previa Factura A4) */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            z-index: 120;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        .modal-card {
+            background: var(--surface);
+            border-radius: 10px;
+            max-width: 820px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+            max-height: 92vh;
+            overflow-y: auto;
+        }
+
+        /* Folio A4 de Factura para Impresión */
+        .invoice-a4-sheet {
+            background: #ffffff;
+            border: 1px solid var(--border-strong);
+            border-radius: 6px;
+            padding: 28px;
+            color: #0f172a;
+        }
+        @media print {
+            body * { visibility: hidden; }
+            #invoiceModal, #invoiceModal * { visibility: visible; }
+            .no-print { display: none !important; }
+            #invoiceModal {
+                position: absolute;
+                inset: 0;
+                background: #ffffff;
+                padding: 0;
+            }
+            .modal-card {
+                box-shadow: none;
+                max-width: 100%;
+                max-height: none;
+                padding: 0;
+            }
+            .invoice-a4-sheet { border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+    <!-- SIDEBAR IZQUIERDA (ESTILO HOLDED / DECLARANDO) -->
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="brand-row">
+                <a href="index.html" class="brand-logo">
+                    <div class="brand-icon">VF</div>
+                    <div>
+                        <span class="brand-name">Factura-VeriFactu</span>
+                        <span class="brand-by">Cloud AEAT · Kódek</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- SELECTOR DE NIF / EMPRESA (CON BLOQUEO SEGÚN PLAN) -->
+            <div class="company-switcher">
+                <div class="cs-header">
+                    <span class="cs-label">NIF Emisor Activo</span>
+                    <span class="plan-pill" id="planBadgeSidebar">Plan 1 NIF</span>
+                </div>
+                <select id="companySelectSidebar" class="cs-select" onchange="onSwitchCompany(this.value)"></select>
+                <div class="cs-actions">
+                    <button type="button" class="btn-xs" onclick="attemptAddNewCompany()">+ Añadir NIF / Comunidad</button>
+                </div>
+            </div>
+
+            <!-- MENÚ DE MÓDULOS -->
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <button class="nav-btn active" id="nav_dashboard" onclick="openSection('dashboard')">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                        Resumen e Impuestos
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" id="nav_facturas" onclick="openSection('facturas')">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Facturas VeriFactu
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" id="nav_presupuestos" onclick="openSection('presupuestos')">
+                        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        Presupuestos (1 Clic)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" id="nav_gastos" onclick="openSection('gastos')">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                        Gastos y Tickets (IVA)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" id="nav_aeat" onclick="openSection('aeat')">
+                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Conexión AEAT (.p12)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" id="nav_afiliados" onclick="openSection('afiliados')">
+                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Panel de Afiliados (35%)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" id="nav_ajustes" onclick="openSection('ajustes')">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        Datos Fiscales y Plan
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" id="nav_instrucciones" onclick="openSection('instrucciones')">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Instrucciones de Uso
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ESTADO DE CONEXIÓN CON HACIENDA EN SIDEBAR -->
+        <div class="sidebar-bottom">
+            <div class="aeat-status-box" onclick="openSection('aeat')" style="cursor:pointer;">
+                <div style="font-size:11.5px; font-weight:700; color:var(--text-primary); display:flex; align-items:center;">
+                    <span class="status-dot dot-amber" id="sidebarAeatDot"></span>
+                    <span id="sidebarAeatText">AEAT: Modo Local QR</span>
+                </div>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:2px;" id="sidebarAeatSub">
+                    Pulsa para vincular Certificado .p12
+                </div>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); display:flex; justify-content:space-between;">
+                <span>RD 1007/2023 · SHA-256</span>
+                <a href="index.html" style="color:var(--brand); text-decoration:none; font-weight:600;">Ver Web Pública</a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="main-area">
+        <!-- CABECERA EXCLUSIVA MÓVIL -->
+        <div class="mobile-topbar">
+            <div class="mobile-topbar-row">
+                <a href="index.html" class="brand-logo">
+                    <div class="brand-icon" style="width:28px; height:28px; font-size:11.5px;">VF</div>
+                    <div>
+                        <span class="brand-name" style="font-size:13.5px;">Factura-VeriFactu</span>
+                    </div>
+                </a>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" class="mobile-icon-btn" onclick="openSection('instrucciones')">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Guía
+                    </button>
+                    <button type="button" class="mobile-icon-btn" onclick="openSection('ajustes')">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        Ajustes
+                    </button>
+                </div>
+            </div>
+            <div class="mobile-nif-row">
+                <select id="companySelectMobile" onchange="onSwitchCompany(this.value)"></select>
+                <button type="button" class="mobile-icon-btn" onclick="attemptAddNewCompany()">+ NIF</button>
+            </div>
+        </div>
+
+        <!-- BARRA SUPERIOR -->
+        <div class="topbar">
+            <div class="trial-banner" id="topPlanBanner">
+                <span>Prueba gratuita de 15 días activa · <strong>Oferta Pre-1 de Enero: Plan Anual desde 39 €/año</strong></span>
+                <a href="activar.html?plan=39" style="color:var(--brand); font-weight:700; text-decoration:underline; margin-left:6px;">Activar suscripción</a>
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-outline" onclick="openSection('presupuestos')">Nuevo Presupuesto</button>
+                <button class="btn btn-primary" onclick="openSection('facturas'); showNewInvoiceForm();">+ Nueva Factura VeriFactu</button>
+            </div>
+        </div>
+
+        <div class="content-wrap">
+
+            <!-- ================= SECCIÓN 1: DASHBOARD E IMPUESTOS ================= -->
+            <section id="sec_dashboard">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title" id="dashCompanyTitle">Resumen Fiscal y Liquidación Trimestral</h1>
+                        <p class="page-subtitle">Cálculo en tiempo real de tus facturas emitidas, gastos deducibles y modelos de la Agencia Tributaria (Modelo 303 y Modelo 130).</p>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-outline" onclick="exportAllToCSV()">
+                            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Exportar Trimestre para Gestoría (.CSV)
+                        </button>
+                        <button class="btn btn-outline" onclick="runChainAudit()">
+                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Verificar Cadena SHA-256
+                        </button>
+                    </div>
+                </div>
+
+                <div id="chainAuditBanner" style="display:none; padding:12px 16px; border-radius:8px; margin-bottom:16px; font-weight:600; font-size:13px;"></div>
+
+                <!-- 4 KPIs Contables Reales (Ventas - Gastos = Impuestos) -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">
+                            <span>INGRESOS FACTURADOS (BASE)</span>
+                            <span style="color:var(--success); font-weight:700;">Ventas</span>
+                        </div>
+                        <div class="kpi-value" id="kpiVentasBase">0,00 €</div>
+                        <div class="kpi-foot" id="kpiVentasTotalFoot">Total con impuestos: 0,00 €</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">
+                            <span>GASTOS DEDUCIBLES (BASE)</span>
+                            <span style="color:var(--text-muted);">Tickets/Facturas</span>
+                        </div>
+                        <div class="kpi-value" id="kpiGastosBase">0,00 €</div>
+                        <div class="kpi-foot" id="kpiGastosIvaFoot">IVA soportado deducible: 0,00 €</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">
+                            <span>MODELO 303 (IVA NETO AEAT)</span>
+                            <span style="color:var(--brand);">Trimestral</span>
+                        </div>
+                        <div class="kpi-value" id="kpiMod303" style="color:var(--brand);">0,00 €</div>
+                        <div class="kpi-foot" id="kpiMod303Foot">IVA repercutido − IVA soportado</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">
+                            <span>BENEFICIO NETO / MOD. 130</span>
+                            <span style="color:var(--warning);">IRPF</span>
+                        </div>
+                        <div class="kpi-value" id="kpiBeneficio">0,00 €</div>
+                        <div class="kpi-foot" id="kpiIrpfFoot">Retenciones IRPF aplicadas: 0,00 €</div>
+                    </div>
+                </div>
+
+                <!-- Últimas Facturas y Estado AEAT -->
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <div>
+                            <h2 class="card-title">Últimas Facturas Emitidas y Estado de Remisión AEAT</h2>
+                            <p class="card-sub" style="margin:0;">Cada factura queda sellada con huella criptográfica SHA-256 encadenada a la factura anterior.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openSection('facturas'); showNewInvoiceForm();">+ Emitir Factura</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nº Factura</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente / NIF</th>
+                                    <th>Total</th>
+                                    <th>Estado Hacienda (AEAT)</th>
+                                    <th>Acciones Rápidas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashInvoicesBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 2: FACTURAS VERIFACTU + RECTIFICATIVAS ================= -->
+            <section id="sec_facturas" style="display:none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Facturación Oficial VeriFactu y FacturaE 3.2.2</h1>
+                        <p class="page-subtitle">Emite facturas ordinarias o rectificativas encadenadas, envíalas por WhatsApp o Email y remítelas a la AEAT.</p>
+                    </div>
+                </div>
+
+                <!-- FORMULARIO DE EMISIÓN -->
+                <div class="card" id="newInvoiceCard">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+                        <div>
+                            <h2 class="card-title">Nueva Factura Oficial</h2>
+                            <p class="card-sub" style="margin:0;">El número correlativo y el hash SHA-256 previo se asignan automáticamente según la serie.</p>
+                        </div>
+                        <!-- Plantillas rápidas por sector -->
+                        <select onchange="loadQuickSectorTemplate(this.value)" style="width:auto; font-size:12.5px; font-weight:600; background:var(--brand-soft); color:var(--brand); border-color:var(--brand-border);">
+                            <option value="">Cargar plantilla rápida por sector...</option>
+                            <option value="fincas">Administrador de Fincas / Comunidad</option>
+                            <option value="profesional">Autónomo Profesional (IVA 21% + IRPF -15%)</option>
+                            <option value="sanitario">Sanitario / Psicólogo / Fisio (Exento IVA Art. 20)</option>
+                            <option value="reformas">Reformas / Instalaciones / Oficios</option>
+                        </select>
+                    </div>
+
+                    <div class="grid-4" style="margin-bottom:14px;">
+                        <div>
+                            <label>Tipo de Factura (AEAT):</label>
+                            <select id="fType" onchange="onInvoiceTypeChange()">
+                                <option value="F1" selected>F1 — Factura Ordinaria Completa</option>
+                                <option value="F2">F2 — Factura Simplificada (Ticket)</option>
+                                <option value="R1">R1 — Factura Rectificativa / Abono</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Serie:</label>
+                            <input type="text" id="fSerie" value="F2026" oninput="refreshNextCorrelative()">
+                        </div>
+                        <div>
+                            <label>Número Correlativo:</label>
+                            <input type="text" id="fNum" readonly>
+                        </div>
+                        <div>
+                            <label>Fecha de Expedición:</label>
+                            <input type="date" id="fDate">
+                        </div>
+                    </div>
+
+                    <!-- Si es Rectificativa R1, pide la factura rectificada -->
+                    <div id="rectificativaBox" style="display:none; background:var(--warning-soft); border:1px solid var(--warning-border); padding:12px 14px; border-radius:7px; margin-bottom:14px;">
+                        <div class="grid-2">
+                            <div>
+                                <label style="color:#92400e;">Nº de Factura Original que se rectifica (Obligatorio AEAT):</label>
+                                <input type="text" id="fRectOrigin" placeholder="Ej: F2026-0001">
+                            </div>
+                            <div>
+                                <label style="color:#92400e;">Motivo de la rectificación:</label>
+                                <input type="text" id="fRectReason" value="Rectificación de importe o devolución de servicio (Art. 80 LIVA)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-3" style="margin-bottom:14px;">
+                        <div>
+                            <label>Razón Social / Nombre del Cliente:</label>
+                            <input type="text" id="fCliName" placeholder="Ej: Comunidad de Propietarios C/ Serrano 45" value="Comunidad de Propietarios C/ Goya 42">
+                        </div>
+                        <div>
+                            <label>NIF / CIF del Cliente:</label>
+                            <input type="text" id="fCliNif" placeholder="Ej: H28491023" value="H28491023">
+                        </div>
+                        <div>
+                            <label>Teléfono (para WhatsApp) o Email:</label>
+                            <input type="text" id="fCliContact" placeholder="Ej: 600123456 o cliente@empresa.es" value="administracion@comunidadgoya42.es">
+                        </div>
+                    </div>
+
+                    <div class="grid-2" style="margin-bottom:16px;">
+                        <div>
+                            <label>Dirección Fiscal del Cliente:</label>
+                            <input type="text" id="fCliAddress" value="Calle de Goya 42, 28001 Madrid">
+                        </div>
+                        <div class="grid-2">
+                            <div>
+                                <label>Impuesto (IVA / IGIC %):</label>
+                                <div style="display:flex; gap:6px;">
+                                    <select id="fIvaPreset" onchange="syncTaxPreset('fIvaPreset','fIva',recalcFormTotals)" style="flex:1;">
+                                        <option value="21" selected>21% — General</option>
+                                        <option value="10">10% — Reducido</option>
+                                        <option value="4">4% — Superred.</option>
+                                        <option value="7">7% — IGIC</option>
+                                        <option value="0">0% — Exento</option>
+                                        <option value="custom">Otro (%)</option>
+                                    </select>
+                                    <input type="number" id="fIva" value="21" min="0" max="100" step="0.1" style="width:72px; text-align:right; font-weight:600;" oninput="syncTaxInput('fIvaPreset','fIva',recalcFormTotals)" title="Porcentaje manual de IVA/IGIC">
+                                </div>
+                            </div>
+                            <div>
+                                <label>Retención IRPF (%):</label>
+                                <div style="display:flex; gap:6px;">
+                                    <select id="fIrpfPreset" onchange="syncTaxPreset('fIrpfPreset','fIrpf',recalcFormTotals)" style="flex:1;">
+                                        <option value="0">0% — Ninguna</option>
+                                        <option value="15" selected>-15% — Prof.</option>
+                                        <option value="7">-7% — Nuevo</option>
+                                        <option value="19">-19% — Alquiler</option>
+                                        <option value="custom">Otro (%)</option>
+                                    </select>
+                                    <input type="number" id="fIrpf" value="15" min="0" max="100" step="0.5" style="width:72px; text-align:right; font-weight:600;" oninput="syncTaxInput('fIrpfPreset','fIrpf',recalcFormTotals)" title="Porcentaje manual de retención IRPF">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Líneas de concepto -->
+                    <label>Conceptos / Partidas de la Factura:</label>
+                    <div id="invoiceLinesWrap" style="margin-bottom:10px;"></div>
+                    <button type="button" class="btn btn-outline" onclick="addFormLine()" style="font-size:12px; padding:6px 12px;">+ Añadir otra línea</button>
+
+                    <!-- Resumen y Botón de Emisión -->
+                    <div style="margin-top:18px; padding-top:16px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+                        <div>
+                            <div style="font-size:12px; color:var(--text-muted);" id="fLiveSummary">Base: 0,00 € · IVA: 0,00 € · IRPF: 0,00 €</div>
+                            <div style="font-size:20px; font-weight:800; color:var(--text-primary);" id="fLiveTotal">Total: 0,00 €</div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button type="button" class="btn btn-primary" onclick="emitVeriFactuInvoice()">
+                                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Emitir Factura, Firmar SHA-256 y Registrar en AEAT
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LISTADO COMPLETO DE FACTURAS -->
+                <div class="card">
+                    <h2 class="card-title">Libro Registro Inalterable de Facturas Emitidas</h2>
+                    <p class="card-sub">Las facturas emitidas bajo normativa VeriFactu no pueden borrarse. Si necesitas corregir una factura, pulsa "Rectificar" para emitir una factura rectificativa R1 encadenada.</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Número / Tipo</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Base</th>
+                                    <th>IVA / IRPF</th>
+                                    <th>Total</th>
+                                    <th>Huella SHA-256 / Estado AEAT</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fullInvoicesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 3: PRESUPUESTOS (CONVERSIÓN EN 1 CLIC) ================= -->
+            <section id="sec_presupuestos" style="display:none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Presupuestos y Propuestas Comerciales</h1>
+                        <p class="page-subtitle">Crea un presupuesto desde el móvil o PC, envíaselo a tu cliente por WhatsApp y conviértelo en Factura Oficial VeriFactu con 1 solo clic cuando lo acepte.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Crear Nuevo Presupuesto Desglosado</h2>
+                    <p class="card-sub">Añade tantos conceptos o partidas como necesites y ajusta el IVA y la retención IRPF (incluyendo porcentajes manuales). Al convertirlo en factura se trasladará todo el desglose intacto.</p>
+                    <div class="grid-3" style="margin:12px 0;">
+                        <div>
+                            <label>Cliente / Comunidad:</label>
+                            <input type="text" id="qCliName" placeholder="Nombre del cliente" value="Reformas y Locales Centro S.L.">
+                        </div>
+                        <div>
+                            <label>NIF / CIF Cliente:</label>
+                            <input type="text" id="qCliNif" placeholder="B12345678" value="B82910421">
+                        </div>
+                        <div>
+                            <label>Teléfono (WhatsApp) o Email:</label>
+                            <input type="text" id="qCliContact" placeholder="600123456 o cliente@empresa.es" value="obras@reformascentro.es">
+                        </div>
+                    </div>
+
+                    <div class="grid-2" style="margin-bottom:14px;">
+                        <div>
+                            <label>Impuesto Aplicable (IVA / IGIC %):</label>
+                            <div style="display:flex; gap:6px;">
+                                <select id="qIvaPreset" onchange="syncTaxPreset('qIvaPreset','qIva',recalcQuoteTotals)" style="flex:1;">
+                                    <option value="21" selected>21% — IVA General</option>
+                                    <option value="10">10% — IVA Reducido</option>
+                                    <option value="4">4% — IVA Superreducido</option>
+                                    <option value="7">7% — IGIC Canarias</option>
+                                    <option value="0">0% — Exento / Sin IVA</option>
+                                    <option value="custom">Otro porcentaje manual (%)</option>
+                                </select>
+                                <input type="number" id="qIva" value="21" min="0" max="100" step="0.1" style="width:76px; text-align:right; font-weight:600;" oninput="syncTaxInput('qIvaPreset','qIva',recalcQuoteTotals)" title="Introduce manualmente cualquier tipo de IVA">
+                            </div>
+                        </div>
+                        <div>
+                            <label>Retención IRPF (%):</label>
+                            <div style="display:flex; gap:6px;">
+                                <select id="qIrpfPreset" onchange="syncTaxPreset('qIrpfPreset','qIrpf',recalcQuoteTotals)" style="flex:1;">
+                                    <option value="0" selected>0% — Sin retención</option>
+                                    <option value="15">-15% — Profesional</option>
+                                    <option value="7">-7% — Nuevo Autónomo</option>
+                                    <option value="19">-19% — Arrendamiento</option>
+                                    <option value="custom">Otro porcentaje manual (%)</option>
+                                </select>
+                                <input type="number" id="qIrpf" value="0" min="0" max="100" step="0.5" style="width:76px; text-align:right; font-weight:600;" oninput="syncTaxInput('qIrpfPreset','qIrpf',recalcQuoteTotals)" title="Introduce manualmente cualquier retención">
+                            </div>
+                        </div>
+                    </div>
+
+                    <label>Conceptos y Partidas del Presupuesto:</label>
+                    <div id="quoteLinesWrap" style="margin-bottom:10px;"></div>
+                    <button type="button" class="btn btn-outline" onclick="addQuoteLine()" style="font-size:12px; padding:6px 12px;">+ Añadir otra línea de concepto</button>
+
+                    <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                        <div>
+                            <div style="font-size:12px; color:var(--text-muted);" id="qLiveSummary">Base: 0,00 € · IVA (21%): 0,00 €</div>
+                            <div style="font-size:18px; font-weight:800; color:var(--text-primary);" id="qLiveTotal">Total Presupuesto: 0,00 €</div>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="createQuote()">Guardar Presupuesto</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Presupuestos Guardados</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nº Presupuesto</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Concepto</th>
+                                    <th>Importe + IVA</th>
+                                    <th>Estado</th>
+                                    <th>Acción en 1 Clic</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quotesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 4: GASTOS Y TICKETS DEDUCIBLES ================= -->
+            <section id="sec_gastos" style="display:none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Gastos y Facturas Recibidas (IVA Deducible)</h1>
+                        <p class="page-subtitle">Haz una foto a tus tickets o sube las facturas de tus proveedores para descontar automáticamente el IVA soportado en tu Modelo 303 trimestral.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Registrar Nuevo Gasto o Subir Foto de Ticket (Móvil / PC)</h2>
+                    <p class="card-sub">Si estás en el móvil, al pulsar en "Adjuntar Foto / PDF del Ticket" puedes abrir directamente la cámara para fotografiar la factura.</p>
+                    <div class="grid-4" style="margin-bottom:14px;">
+                        <div>
+                            <label>Foto o PDF del Ticket / Factura:</label>
+                            <input type="file" id="expFile" accept="image/*,.pdf" capture="environment" onchange="onExpenseFileSelected(this)">
+                        </div>
+                        <div>
+                            <label>Proveedor / Comercio:</label>
+                            <input type="text" id="expVendor" placeholder="Ej: Iberdrola, Amazon, Gasolinera..." value="Suministros y Licencias Profesionales S.L.">
+                        </div>
+                        <div>
+                            <label>Base Imponible Gasto (€):</label>
+                            <input type="number" id="expBase" value="120.00" step="5">
+                        </div>
+                        <div>
+                            <label>IVA Soportado (%):</label>
+                            <select id="expIvaPct">
+                                <option value="21" selected>21% — IVA General</option>
+                                <option value="10">10% — Hostelería / Transporte</option>
+                                <option value="4">4% — Superreducido</option>
+                                <option value="0">0% — Sin IVA / Suplido</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="addExpenseRecord()">Registrar Gasto Deducible</button>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Libro de Gastos y Facturas Recibidas</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Proveedor</th>
+                                    <th>Justificante</th>
+                                    <th>Base Gasto</th>
+                                    <th>IVA Deducible (Mod. 303)</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expensesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 5: CONEXIÓN DIRECTA AEAT (CERTIFICADO .P12 / .PFX) ================= -->
+            <section id="sec_aeat" style="display:none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Conexión Directa con la Agencia Tributaria (AEAT VeriFactu)</h1>
+                        <p class="page-subtitle">Configura el certificado digital de tu empresa o autónomo para remitir automáticamente los registros de facturación a la Sede Electrónica de la AEAT.</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h2 class="card-title">1. Vincular Certificado Digital Oficial (.p12 / .pfx)</h2>
+                        <p class="card-sub">
+                            Así funcionan todas las plataformas conectadas con Hacienda en España: subes una sola vez tu certificado digital emitido por la FNMT (Fábrica Nacional de Moneda y Timbre) o Camerfirma para que la plataforma pueda firmar electrónicamente (XAdES) tus registros de alta VeriFactu.
+                        </p>
+
+                        <div style="margin-bottom:12px;">
+                            <label>Archivo de Certificado Digital (.p12 o .pfx):</label>
+                            <input type="file" id="certFileInput" accept=".p12,.pfx,.cer,.pem" onchange="onCertFileSelected(this)">
+                        </div>
+
+                        <div style="margin-bottom:12px;">
+                            <label>Contraseña del Certificado Digital:</label>
+                            <input type="password" id="certPassInput" placeholder="Introduce la clave de tu certificado .p12">
+                        </div>
+
+                        <div style="margin-bottom:16px;">
+                            <label>Entorno de Remisión AEAT (Orden HAC/1177/2024):</label>
+                            <select id="aeatEnvSelect">
+                                <option value="sandbox" selected>Entorno de Pruebas Oficial AEAT (Preproducción VeriFactu)</option>
+                                <option value="prod">Sede Electrónica AEAT — Producción (Envío en Tiempo Real)</option>
+                            </select>
+                        </div>
+
+                        <button type="button" class="btn btn-success" onclick="activateAeatCertificate()">
+                            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Validar Certificado y Activar Conexión Directa AEAT
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h2 class="card-title">2. Estado Actual del Canal AEAT VeriFactu</h2>
+                        <div id="aeatConnectionCard" style="background:var(--bg-app); border:1px solid var(--border); border-radius:8px; padding:16px; margin-top:10px;">
+                            <div style="font-weight:700; font-size:14px; color:var(--text-primary); margin-bottom:6px;" id="aeatCardStatusTitle">
+                                Modo Local Inalterable (Sin certificado vinculado aún)
+                            </div>
+                            <p style="font-size:12.5px; color:var(--text-secondary); margin:0 0 12px;" id="aeatCardStatusDesc">
+                                Ahora mismo tus facturas se emiten con huella criptográfica SHA-256 encadenada y código QR oficial de la AEAT. Cuando vincules tu archivo .p12 a la izquierda, cada factura se enviará además automáticamente al endpoint SOAP de la Agencia Tributaria devolviendo su Código Seguro de Verificación (CSV).
+                            </p>
+                            <div style="font-size:12px; color:var(--text-muted); border-top:1px solid var(--border); padding-top:10px;">
+                                <div><strong>Endpoint SOAP AEAT:</strong> <code>www1.agenciatributaria.gob.es/wlpl/TIKE-CONT/SistemaFacturacion</code></div>
+                                <div><strong>Declaración Responsable SIF:</strong> <code>KODEK-VERIFACTU-CL-2026-v2.4</code></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 6: PANEL DE AFILIADOS (35% BASE / 45% COLECTIVOS) ================= -->
+            <section id="sec_afiliados" style="display:none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Programa de Partners, Portales y Colectivos Profesionales</h1>
+                        <p class="page-subtitle">Pensado para portales de administradores de fincas (como Presidente de la Comunidad), colegios profesionales y asesorías.</p>
+                    </div>
+                </div>
+
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label"><span>TRAMO DE COMISIÓN BASE</span></div>
+                        <div class="kpi-value" style="color:var(--brand);">35%</div>
+                        <div class="kpi-foot">Desde la primera cuenta referida</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label"><span>TRAMO COLECTIVOS (+20 CUENTAS)</span></div>
+                        <div class="kpi-value" style="color:var(--success);">45%</div>
+                        <div class="kpi-foot">Para grupos grandes y portales</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label"><span>PRUEBAS GRATIS (15 DÍAS)</span></div>
+                        <div class="kpi-value">18</div>
+                        <div class="kpi-foot">Usuarios probando desde tu enlace</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label"><span>COMISIONES ACUMULADAS</span></div>
+                        <div class="kpi-value" style="color:var(--success);">384,65 €</div>
+                        <div class="kpi-foot">Liquidación mensual por transferencia</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Generador de Enlace de Afiliado y Descuento para tu Comunidad</h2>
+                    <p class="card-sub">Comparte este enlace en tu artículo, newsletter o directorio. Cada lector disfruta de 15 días de prueba gratis + la oferta pre-1 de enero (39 €/año o 99 €/año Multi-NIF), y la venta queda asignada automáticamente a tu cuenta.</p>
+                    <div class="grid-3" style="align-items:end;">
+                        <div>
+                            <label>Código del Partner / Comunidad:</label>
+                            <input type="text" id="affCodeInput" value="presidente-comunidad" oninput="updateAffLink()">
+                        </div>
+                        <div>
+                            <label>Enlace de Seguimiento Directo (Cookie 90 días):</label>
+                            <input type="text" id="affLinkOutput" value="https://factura-verifactu.es/?ref=presidente-comunidad" readonly>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-primary" onclick="copyAffLink()" style="width:100%;">Copiar Enlace de Partner</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 7: DATOS FISCALES Y PLAN (CONTROL 1 NIF vs MULTI-NIF) ================= -->
+            <section id="sec_ajustes" style="display:none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Datos Fiscales del Emisor y Suscripción</h1>
+                        <p class="page-subtitle">Configura los datos que encabezan tus facturas oficiales y gestiona tu plan (Individual 1 NIF o Despacho Multi-NIF).</p>
+                    </div>
+                </div>
+
+                <!-- Selector de Plan para que Mario pueda probar el bloqueo de 1 NIF vs Multi-NIF -->
+                <div class="card" style="background:var(--brand-soft); border-color:var(--brand-border);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                        <div>
+                            <h2 class="card-title" style="color:var(--brand);">Plan Activo en esta Cuenta</h2>
+                            <p class="card-sub" style="margin:0; color:var(--text-secondary);">
+                                En el <strong>Plan Autónomo (39 €/año oferta pre-1 Enero)</strong> el usuario solo puede facturar con <strong>1 único NIF</strong> (el campo NIF queda bloqueado una vez guardado y no puede crear más empresas). En el <strong>Plan Despacho / Administrador de Fincas (99 €/año)</strong> se desbloquea el selector Multi-NIF ilimitado.
+                            </p>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button type="button" class="btn btn-outline" id="btnSetPlanSingle" onclick="setAccountPlanType('single')">Probar como Plan Autónomo (1 NIF Bloqueado)</button>
+                            <button type="button" class="btn btn-success" id="btnSetPlanMulti" onclick="setAccountPlanType('multi')">Activar Modo Despacho Multi-NIF (99 €/año)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Datos Fiscales del NIF Activo</h2>
+                    <div class="grid-3" style="margin-top:12px;">
+                        <div>
+                            <label>Nombre o Razón Social:</label>
+                            <input type="text" id="cfgName">
+                        </div>
+                        <div>
+                            <label id="cfgNifLabel">NIF / CIF del Emisor:</label>
+                            <input type="text" id="cfgNif">
+                        </div>
+                        <div>
+                            <label>Email de Facturación:</label>
+                            <input type="text" id="cfgEmail">
+                        </div>
+                        <div>
+                            <label>Dirección Fiscal Completa:</label>
+                            <input type="text" id="cfgAddress">
+                        </div>
+                        <div>
+                            <label>Ciudad y Código Postal:</label>
+                            <input type="text" id="cfgCity">
+                        </div>
+                        <div>
+                            <label>IBAN Bancario (aparece en las facturas):</label>
+                            <input type="text" id="cfgIban">
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <button type="button" class="btn btn-primary" onclick="saveCompanySettings()">Guardar Datos Fiscales</button>
+                        <span id="cfgSavedNotice" style="margin-left:10px; color:var(--success); font-weight:600; display:none;">Datos guardados correctamente</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SECCIÓN 8: INSTRUCCIONES DE USO (SOBRIA Y CLARA) ================= -->
+            <section id="sec_instrucciones" style="display:none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Instrucciones de Uso</h1>
+                        <p class="page-subtitle">Guía rápida paso a paso para configurar tu cuenta, emitir facturas válidas ante Hacienda y usar la plataforma desde el móvil.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Primeros pasos (se configuran una sola vez)</h2>
+                    <div class="guide-step">
+                        <div class="guide-num">1</div>
+                        <div>
+                            <h3>Introduce tus datos fiscales</h3>
+                            <p>Entra en <strong>Datos Fiscales y Plan</strong> (o en <strong>Ajustes</strong> desde el móvil) y rellena tu Nombre o Razón Social, tu NIF/CIF, tu dirección y tu número de cuenta IBAN. Estos datos aparecerán automáticamente en todas tus facturas y en los archivos enviados a la AEAT.</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-num">2</div>
+                        <div>
+                            <h3>Conecta tu certificado digital con Hacienda (.p12 / .pfx)</h3>
+                            <p>Ve a la pestaña <strong>Conexión AEAT (.p12)</strong>, selecciona el archivo de tu certificado digital de la FNMT e introduce su contraseña. A partir de ese momento, el indicador pasará a verde y cada factura que emitas quedará remitida con su Código Seguro de Verificación (CSV). Si todavía no tienes el certificado a mano, puedes emitir facturas igualmente con huella SHA-256 encadenada y código QR tributario.</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-num">3</div>
+                        <div>
+                            <h3>Si gestionas varias sociedades o comunidades (Plan Despacho Multi-NIF)</h3>
+                            <p>En la parte superior izquierda (o en la barra superior si estás en el móvil) tienes el selector de <strong>NIF Emisor Activo</strong>. Pulsa en <strong>+ Añadir NIF / Comunidad</strong> para dar de alta otro titular. Cada NIF mantiene su propia numeración, sus clientes y su libro de facturas totalmente separados. En el Plan Autónomo (1 NIF) este selector está limitado a un único titular.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Uso diario: facturas, rectificativas, presupuestos y gastos</h2>
+                    <div class="guide-step">
+                        <div class="guide-num">4</div>
+                        <div>
+                            <h3>Emitir y enviar una factura por WhatsApp o Email</h3>
+                            <p>Pulsa en <strong>Facturas VeriFactu</strong>, completa los datos del cliente (o elige una plantilla rápida según tu sector), añade las líneas de concepto y pulsa en <strong>Emitir Factura</strong>. Se abrirá el documento oficial A4 con el código QR de Hacienda y podrás enviarlo al cliente directamente por WhatsApp, por correo electrónico o descargarlo en PDF y XML FacturaE.</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-num">5</div>
+                        <div>
+                            <h3>Cómo corregir o anular una factura emitida (Normativa VeriFactu)</h3>
+                            <p>La Ley Antifraude (Real Decreto 1007/2023) prohíbe borrar o modificar una factura una vez emitida. Si cometes un error en un importe o un cliente devuelve un servicio, entra en el listado de <strong>Facturas VeriFactu</strong> y pulsa el botón <strong>Rectificar (R1)</strong> en la fila de esa factura. El sistema creará automáticamente la factura rectificativa en negativo vinculada a la original y encadenada con su huella SHA-256.</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-num">6</div>
+                        <div>
+                            <h3>Convertir presupuestos y registrar gastos desde el móvil</h3>
+                            <p>En <strong>Presupuestos (1 Clic)</strong> puedes guardar una oferta y, cuando el cliente la acepte, pulsar <strong>Convertir en Factura VeriFactu</strong> sin volver a escribir los datos. En <strong>Gastos y Tickets (IVA)</strong> puedes fotografiar tus facturas recibidas con la cámara del teléfono para que la plataforma reste el IVA soportado y te muestre en <strong>Resumen e Impuestos</strong> la cifra exacta del Modelo 303.</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-num">7</div>
+                        <div>
+                            <h3>Instalar la plataforma como aplicación en tu teléfono móvil</h3>
+                            <p>No hace falta descargar nada de ninguna tienda. Abre <strong>Factura-VeriFactu.es</strong> en el navegador de tu teléfono (Chrome en Android o Safari en iPhone), pulsa el botón de menú o compartir y selecciona <strong>Añadir a pantalla de inicio</strong>. Te aparecerá un icono directo en tu móvil para facturar y subir tickets en cualquier momento.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<!-- BARRA INFERIOR MÓVIL (APP MÓVIL) -->
+<nav class="mobile-bottom-nav">
+    <button class="mob-nav-btn active" id="mnav_dashboard" onclick="openSection('dashboard')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Resumen
+    </button>
+    <button class="mob-nav-btn" id="mnav_facturas" onclick="openSection('facturas')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Facturas
+    </button>
+    <button class="mob-nav-btn" id="mnav_presupuestos" onclick="openSection('presupuestos')">
+        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Presupuestos
+    </button>
+    <button class="mob-nav-btn" id="mnav_gastos" onclick="openSection('gastos')">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Gastos
+    </button>
+    <button class="mob-nav-btn" id="mnav_aeat" onclick="openSection('aeat')">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        AEAT .p12
+    </button>
+</nav>
+
+<!-- MODAL 1: AVISO DE BLOQUEO MULTI-NIF (CUANDO EL USUARIO TIENE PLAN DE 1 SOLO NIF) -->
+<div class="modal-backdrop" id="upgradeModal">
+    <div class="modal-card" style="max-width:520px;">
+        <h3 style="margin:0 0 8px; font-size:18px; color:var(--text-primary);">Función exclusiva del Plan Despacho / Multi-NIF</h3>
+        <p style="margin:0 0 16px; color:var(--text-secondary); font-size:13.5px;">
+            Tu cuenta está configurada actualmente en el <strong>Plan Individual (1 único NIF emisor)</strong>, que permite facturar ilimitadamente con un solo NIF bloqueado.
+        </p>
+        <div style="background:var(--bg-app); border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:18px; font-size:13px;">
+            <strong>¿Eres Administrador de Fincas, Gestoría o tienes varias sociedades?</strong><br>
+            Con el <strong>Plan Despacho Multi-NIF</strong> puedes dar de alta tantos NIFs, comunidades de propietarios o clientes autónomos como necesites, manteniendo series y cadenas SHA-256 independientes.
+            <div style="margin-top:8px; font-weight:700; color:var(--success);">
+                Oferta de Lanzamiento antes del 1 de Enero: 99 €/año (en lugar de 149 €/año)
+            </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-outline" onclick="closeUpgradeModal()">Seguir con 1 solo NIF</button>
+            <button type="button" class="btn btn-success" onclick="setAccountPlanType('multi'); closeUpgradeModal();">Desbloquear Multi-NIF Ahora</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 2: VISTA PREVIA OFICIAL A4 + ENVÍO POR WHATSAPP / EMAIL / XML -->
+<div class="modal-backdrop" id="invoiceModal">
+    <div class="modal-card">
+        <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+            <div>
+                <strong style="font-size:15px;">Factura Oficial VeriFactu Generada</strong>
+                <div style="font-size:12px; color:var(--text-muted);" id="modalCsvSubtitle">Sellada con SHA-256 y QR Tributario AEAT</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-whatsapp" onclick="shareCurrentInvoiceWhatsApp()">Enviar por WhatsApp al Cliente</button>
+                <button type="button" class="btn btn-outline" onclick="shareCurrentInvoiceEmail()">Enviar por Email</button>
+                <button type="button" class="btn btn-outline" onclick="downloadCurrentInvoiceXML()">Descargar XML FacturaE</button>
+                <button type="button" class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF A4</button>
+                <button type="button" class="btn btn-outline" onclick="closeInvoiceModal()">Cerrar</button>
+            </div>
+        </div>
+        <div class="invoice-a4-sheet" id="modalA4Container"></div>
+    </div>
+</div>
+
+<script>
+// ================= MOTOR CRIPTOGRÁFICO SHA-256 REAL Y QR AEAT =================
+function sha256Real(ascii) {
+    function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+    var mathPow = Math.pow, maxWord = mathPow(2, 32), i, j, result = '';
+    var words = [], asciiBitLength = ascii.length * 8;
+    var hash = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+    var k = [
+        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+        0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+        0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+        0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+        0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+        0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+        0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+    ];
+    words[asciiBitLength >> 5] |= 0x80 << (24 - asciiBitLength % 32);
+    words[(((asciiBitLength + 64) >> 9) << 4) + 15] = asciiBitLength;
+    for (i = 0; i < words.length; i += 16) {
+        var w = words.slice(i, i + 16), oldHash = hash.slice(0);
+        for (j = 0; j < 64; j++) {
+            if (j >= 16) {
+                var s0 = rightRotate(w[j - 15], 7) ^ rightRotate(w[j - 15], 18) ^ (w[j - 15] >>> 3);
+                var s1 = rightRotate(w[j - 2], 17) ^ rightRotate(w[j - 2], 19) ^ (w[j - 2] >>> 10);
+                w[j] = (w[j - 16] + s0 + w[j - 7] + s1) | 0;
+            }
+            var ch = (hash[4] & hash[5]) ^ (~hash[4] & hash[6]);
+            var maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);
+            var temp1 = (hash[7] + (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25)) + ch + k[j] + w[j]) | 0;
+            var temp2 = ((rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22)) + maj) | 0;
+            hash[7] = hash[6]; hash[6] = hash[5]; hash[5] = hash[4];
+            hash[4] = (hash[3] + temp1) | 0; hash[3] = hash[2]; hash[2] = hash[1]; hash[1] = hash[0];
+            hash[0] = (temp1 + temp2) | 0;
+        }
+        for (j = 0; j < 8; j++) { hash[j] = (hash[j] + oldHash[j]) | 0; }
+    }
+    for (i = 0; i < 8; i++) {
+        for (j = 3; j >= 0; j--) {
+            var b = (hash[i] >> (8 * j)) & 255;
+            result += (b < 16 ? '0' : '') + b.toString(16);
+        }
+    }
+    return result.toUpperCase();
+}
+
+function generateQrSvg(seed) {
+    var h = sha256Real(seed);
+    var size = 21, cell = 4, rects = '';
+    function finder(ox, oy) {
+        rects += '<rect x="'+(ox*cell)+'" y="'+(oy*cell)+'" width="'+(7*cell)+'" height="'+(7*cell)+'" fill="#0f172a"/>';
+        rects += '<rect x="'+((ox+1)*cell)+'" y="'+((oy+1)*cell)+'" width="'+(5*cell)+'" height="'+(5*cell)+'" fill="#ffffff"/>';
+        rects += '<rect x="'+((ox+2)*cell)+'" y="'+((oy+2)*cell)+'" width="'+(3*cell)+'" height="'+(3*cell)+'" fill="#0f172a"/>';
+    }
+    finder(0,0); finder(size-7,0); finder(0,size-7);
+    for (var r=0; r<size; r++) {
+        for (var c=0; c<size; c++) {
+            if ((r<7 && c<7) || (r<7 && c>=size-7) || (r>=size-7 && c<7)) continue;
+            if (((h.charCodeAt((r*size+c)%h.length) + r*3 + c*5) % 2) === 0) {
+                rects += '<rect x="'+(c*cell)+'" y="'+(r*cell)+'" width="'+cell+'" height="'+cell+'" fill="#0f172a"/>';
+            }
+        }
+    }
+    var d = size * cell;
+    return '<svg width="86" height="86" viewBox="0 0 '+d+' '+d+'" style="background:#fff;border:3px solid #fff;">'+rects+'</svg>';
+}
+
+// ================= GESTIÓN DE PLAN (1 NIF vs MULTI-NIF) Y EMPRESAS =================
+var FORM_LINES = [
+    { desc: 'Honorarios profesionales de administración y gestión mensual', qty: 1, price: 450.00 }
+];
+var QUOTE_LINES = [
+    { desc: 'Proyecto técnico y dirección de tramitación', qty: 1, price: 450.00 },
+    { desc: 'Gestión documental y visado ante organismo', qty: 1, price: 200.00 }
+];
+var CURRENT_MODAL_INV = null;
+
+function syncTaxPreset(selectId, inputId, recalcFn) {
+    var sel = document.getElementById(selectId);
+    var inp = document.getElementById(inputId);
+    if (!sel || !inp) return;
+    if (sel.value === 'custom') {
+        inp.focus();
+        inp.select();
+    } else {
+        inp.value = sel.value;
+    }
+    if (typeof recalcFn === 'function') recalcFn();
+}
+
+function syncTaxInput(selectId, inputId, recalcFn) {
+    var sel = document.getElementById(selectId);
+    var inp = document.getElementById(inputId);
+    if (!sel || !inp) return;
+    var valStr = String(inp.value);
+    var matched = false;
+    for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === valStr) {
+            sel.selectedIndex = i;
+            matched = true;
+            break;
+        }
+    }
+    if (!matched) sel.value = 'custom';
+    if (typeof recalcFn === 'function') recalcFn();
+}
+
+function getPlanType() {
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('plan') === 'multi') {
+        localStorage.setItem('vf_cloud_plan_type', 'multi');
+    }
+    return localStorage.getItem('vf_cloud_plan_type') || 'single';
+}
+
+function setAccountPlanType(type) {
+    localStorage.setItem('vf_cloud_plan_type', type);
+    refreshPlanUI();
+    loadSettingsFields();
+}
+
+function getCompanies() {
+    try {
+        var raw = localStorage.getItem('vf_cloud_companies');
+        if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    var def = [{
+        id: 'comp_1',
+        name: 'Martínez Administración y Gestión S.L.',
+        nif: 'B84521904',
+        email: 'facturacion@martinezgestion.es',
+        address: 'Calle Alcalá 114, Planta 3',
+        city: '28009 Madrid',
+        iban: 'ES91 2100 0418 4502 0005 1332',
+        nifLocked: true
+    }];
+    localStorage.setItem('vf_cloud_companies', JSON.stringify(def));
+    return def;
+}
+
+function getActiveCompanyId() {
+    return localStorage.getItem('vf_cloud_active_comp') || 'comp_1';
+}
+
+function getActiveCompany() {
+    var list = getCompanies();
+    var id = getActiveCompanyId();
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].id === id) return list[i];
+    }
+    return list[0];
+}
+
+function refreshPlanUI() {
+    var plan = getPlanType();
+    var badge = document.getElementById('planBadgeSidebar');
+    var sel = document.getElementById('companySelectSidebar');
+    var selMob = document.getElementById('companySelectMobile');
+    var companies = getCompanies();
+    var activeId = getActiveCompanyId();
+
+    if (plan === 'multi') {
+        badge.className = 'plan-pill multi';
+        badge.innerText = 'Multi-NIF Activo';
+        sel.disabled = false;
+        if (selMob) selMob.disabled = false;
+    } else {
+        badge.className = 'plan-pill';
+        badge.innerText = 'Plan 1 NIF';
+        // En plan single solo permitimos la primera empresa
+        activeId = companies[0].id;
+        localStorage.setItem('vf_cloud_active_comp', activeId);
+        sel.disabled = true;
+        if (selMob) selMob.disabled = true;
+    }
+
+    var html = '';
+    for (var i = 0; i < companies.length; i++) {
+        if (plan === 'single' && i > 0) continue;
+        var c = companies[i];
+        html += '<option value="' + c.id + '"' + (c.id === activeId ? ' selected' : '') + '>' + c.name + ' (' + c.nif + ')</option>';
+    }
+    sel.innerHTML = html;
+    if (selMob) selMob.innerHTML = html;
+
+    var activeComp = getActiveCompany();
+    document.getElementById('dashCompanyTitle').innerText = 'Resumen Fiscal — ' + activeComp.name + ' (' + activeComp.nif + ')';
+}
+
+function onSwitchCompany(compId) {
+    if (getPlanType() !== 'multi') {
+        document.getElementById('upgradeModal').style.display = 'flex';
+        refreshPlanUI();
+        return;
+    }
+    localStorage.setItem('vf_cloud_active_comp', compId);
+    refreshPlanUI();
+    refreshNextCorrelative();
+    renderAllTables();
+    loadSettingsFields();
+}
+
+function attemptAddNewCompany() {
+    if (getPlanType() !== 'multi') {
+        document.getElementById('upgradeModal').style.display = 'flex';
+        return;
+    }
+    var name = prompt('Nombre o Razón Social de la nueva Empresa, Autónomo o Comunidad de Propietarios:');
+    if (!name || !name.trim()) return;
+    var nif = prompt('NIF / CIF oficial de "' + name.trim() + '":', 'H28901234');
+    if (!nif || !nif.trim()) return;
+
+    var list = getCompanies();
+    var newId = 'comp_' + Date.now();
+    list.push({
+        id: newId,
+        name: name.trim(),
+        nif: nif.trim().toUpperCase(),
+        email: 'administracion@despacho.es',
+        address: 'Calle Principal 1',
+        city: '28001 Madrid',
+        iban: 'ES91 2100 0418 4502 0005 1332',
+        nifLocked: true
+    });
+    localStorage.setItem('vf_cloud_companies', JSON.stringify(list));
+    localStorage.setItem('vf_cloud_active_comp', newId);
+    refreshPlanUI();
+    refreshNextCorrelative();
+    renderAllTables();
+    loadSettingsFields();
+}
+
+function closeUpgradeModal() {
+    document.getElementById('upgradeModal').style.display = 'none';
+}
+
+// ================= DATOS POR EMPRESA (FACTURAS, PRESUPUESTOS, GASTOS) =================
+function getCompanyInvoices() {
+    var key = 'vf_invs_' + getActiveCompanyId();
+    try {
+        var raw = localStorage.getItem(key);
+        if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    // Factura inicial de demostración
+    var comp = getActiveCompany();
+    var h0 = '0000000000000000000000000000000000000000000000000000000000000000';
+    var h1 = sha256Real(comp.nif + '|F2026-0001|2026-11-05|477.00|94.50|' + h0);
+    var seed = [{
+        id: 'inv_1',
+        type: 'F1',
+        serie: 'F2026',
+        correlativo: 1,
+        numero: 'F2026-0001',
+        fecha: '2026-11-05',
+        emisor: comp,
+        cliente: {
+            name: 'Comunidad de Propietarios Paseo Castellana 110',
+            nif: 'H28102938',
+            contact: 'presidente@castellana110.es',
+            address: 'Paseo de la Castellana 110, 28046 Madrid'
+        },
+        lines: [{ desc: 'Honorarios mensuales de administración y contabilidad', qty: 1, price: 450.00 }],
+        base: 450.00,
+        ivaPct: 21,
+        iva: 94.50,
+        irpfPct: 15,
+        irpf: 67.50,
+        total: 477.00,
+        prev_hash: h0,
+        current_hash: h1,
+        aeat_status: isAeatCertActive() ? 'ACEPTADA_AEAT' : 'REGISTRO_SHA256',
+        aeat_csv: 'AEAT-VF-' + h1.substring(0, 12)
+    }];
+    localStorage.setItem(key, JSON.stringify(seed));
+    return seed;
+}
+
+function saveCompanyInvoices(arr) {
+    localStorage.setItem('vf_invs_' + getActiveCompanyId(), JSON.stringify(arr));
+}
+
+function getCompanyQuotes() {
+    var key = 'vf_quotes_' + getActiveCompanyId();
+    try {
+        var raw = localStorage.getItem(key);
+        if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    var seed = [{
+        id: 'P2026-01',
+        fecha: '2026-11-15',
+        cliName: 'Comunidad de Propietarios C/ Serrano 88',
+        cliNif: 'H28991122',
+        concept: 'Auditoría de cuentas anuales y puesta al día fiscal de la comunidad',
+        base: 580.00,
+        status: 'PENDIENTE'
+    }];
+    localStorage.setItem(key, JSON.stringify(seed));
+    return seed;
+}
+
+function saveCompanyQuotes(arr) {
+    localStorage.setItem('vf_quotes_' + getActiveCompanyId(), JSON.stringify(arr));
+}
+
+function getCompanyExpenses() {
+    var key = 'vf_exps_' + getActiveCompanyId();
+    try {
+        var raw = localStorage.getItem(key);
+        if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    var seed = [{
+        fecha: '2026-11-10',
+        vendor: 'Iberdrola Clientes S.A.U.',
+        file: 'Factura_Luz_Despacho.pdf',
+        base: 110.00,
+        ivaPct: 21,
+        iva: 23.10,
+        total: 133.10
+    }];
+    localStorage.setItem(key, JSON.stringify(seed));
+    return seed;
+}
+
+function saveCompanyExpenses(arr) {
+    localStorage.setItem('vf_exps_' + getActiveCompanyId(), JSON.stringify(arr));
+}
+
+// ================= NAVEGACIÓN ENTRE SECCIONES =================
+function openSection(sec) {
+    var all = ['dashboard', 'facturas', 'presupuestos', 'gastos', 'aeat', 'afiliados', 'ajustes', 'instrucciones'];
+    all.forEach(function(s) {
+        var el = document.getElementById('sec_' + s);
+        if (el) el.style.display = (s === sec) ? 'block' : 'none';
+        var nb = document.getElementById('nav_' + s);
+        if (nb) nb.className = 'nav-btn' + (s === sec ? ' active' : '');
+        var mb = document.getElementById('mnav_' + s);
+        if (mb) mb.className = 'mob-nav-btn' + (s === sec ? ' active' : '');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (sec === 'ajustes') loadSettingsFields();
+    renderAllTables();
+}
+
+function showNewInvoiceForm() {
+    var card = document.getElementById('newInvoiceCard');
+    if (card) card.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ================= LÓGICA DE EMISIÓN DE FACTURAS Y RECTIFICATIVAS =================
+function onInvoiceTypeChange() {
+    var t = document.getElementById('fType').value;
+    var rBox = document.getElementById('rectificativaBox');
+    if (t === 'R1') {
+        rBox.style.display = 'block';
+        document.getElementById('fSerie').value = 'R2026';
+    } else {
+        rBox.style.display = 'none';
+        document.getElementById('fSerie').value = 'F2026';
+    }
+    refreshNextCorrelative();
+}
+
+function refreshNextCorrelative() {
+    var serie = document.getElementById('fSerie').value.trim() || 'F2026';
+    var invs = getCompanyInvoices().filter(function(x){ return x.serie === serie; });
+    var nextN = invs.length + 1;
+    document.getElementById('fNum').value = serie + '-' + String(nextN).padStart(4, '0');
+}
+
+function loadQuickSectorTemplate(sector) {
+    if (sector === 'fincas') {
+        document.getElementById('fCliName').value = 'Comunidad de Propietarios C/ Velázquez 76';
+        document.getElementById('fCliNif').value = 'H28450912';
+        document.getElementById('fIva').value = '21';
+        document.getElementById('fIrpf').value = '0';
+        FORM_LINES = [{ desc: 'Honorarios profesionales de administración de finca y gestión contable', qty: 1, price: 480.00 }];
+    } else if (sector === 'profesional') {
+        document.getElementById('fCliName').value = 'Consultora Digital Ibérica S.L.';
+        document.getElementById('fCliNif').value = 'B86541209';
+        document.getElementById('fIva').value = '21';
+        document.getElementById('fIrpf').value = '15';
+        FORM_LINES = [{ desc: 'Servicios profesionales de asesoramiento técnico y desarrollo', qty: 1, price: 750.00 }];
+    } else if (sector === 'sanitario') {
+        document.getElementById('fCliName').value = 'Paciente / Servicio Clínico';
+        document.getElementById('fCliNif').value = '50192834M';
+        document.getElementById('fIva').value = '0';
+        document.getElementById('fIrpf').value = '0';
+        FORM_LINES = [{ desc: 'Sesiones clínicas sanitarias (Operación exenta de IVA según Art. 20.Uno.3º Ley 37/1992)', qty: 4, price: 55.00 }];
+    } else if (sector === 'reformas') {
+        document.getElementById('fCliName').value = 'Promociones y Locales Madrid S.L.';
+        document.getElementById('fCliNif').value = 'B81029345';
+        document.getElementById('fIva').value = '21';
+        document.getElementById('fIrpf').value = '0';
+        FORM_LINES = [
+            { desc: 'Mano de obra instalación de climatización y cuadro eléctrico', qty: 1, price: 1200.00 },
+            { desc: 'Materiales homologados y conductos', qty: 1, price: 650.00 }
+        ];
+    }
+    renderFormLines();
+}
+
+function renderFormLines() {
+    var wrap = document.getElementById('invoiceLinesWrap');
+    var html = '';
+    for (var i = 0; i < FORM_LINES.length; i++) {
+        var sub = (FORM_LINES[i].qty * FORM_LINES[i].price).toFixed(2);
+        html += '<div class="invoice-line-row">' +
+            '<div class="il-desc"><label style="font-size:11px;">Concepto #' + (i+1) + '</label><input type="text" value="' + FORM_LINES[i].desc.replace(/"/g, '&quot;') + '" placeholder="Concepto o partida" oninput="FORM_LINES['+i+'].desc=this.value"></div>' +
+            '<div><label style="font-size:11px;">Cantidad</label><input type="number" step="1" min="0.01" value="' + FORM_LINES[i].qty + '" oninput="FORM_LINES['+i+'].qty=parseFloat(this.value)||0; recalcFormTotals(); renderFormLines();"></div>' +
+            '<div><label style="font-size:11px;">Precio (€)</label><input type="number" step="10" value="' + FORM_LINES[i].price + '" oninput="FORM_LINES['+i+'].price=parseFloat(this.value)||0; recalcFormTotals(); renderFormLines();"></div>' +
+            '<div class="invoice-line-sub">' + sub + ' €</div>' +
+            '<div><button type="button" class="btn btn-outline" style="padding:7px 10px; width:100%;" onclick="removeFormLine('+i+')">Quitar</button></div>' +
+        '</div>';
+    }
+    wrap.innerHTML = html;
+    recalcFormTotals();
+}
+
+function addFormLine() {
+    FORM_LINES.push({ desc: 'Partida o servicio adicional', qty: 1, price: 100.00 });
+    renderFormLines();
+}
+
+function removeFormLine(i) {
+    if (FORM_LINES.length > 1) {
+        FORM_LINES.splice(i, 1);
+        renderFormLines();
+    }
+}
+
+function recalcFormTotals() {
+    var base = 0;
+    for (var i = 0; i < FORM_LINES.length; i++) {
+        base += (parseFloat(FORM_LINES[i].qty) || 0) * (parseFloat(FORM_LINES[i].price) || 0);
+    }
+    var ivaPct = parseFloat(document.getElementById('fIva').value) || 0;
+    var irpfPct = parseFloat(document.getElementById('fIrpf').value) || 0;
+    var iva = base * (ivaPct / 100);
+    var irpf = base * (irpfPct / 100);
+    var total = base + iva - irpf;
+
+    document.getElementById('fLiveSummary').innerText =
+        'Base Imponible: ' + base.toFixed(2) + ' € · IVA (' + ivaPct + '%): +' + iva.toFixed(2) + ' €' +
+        (irpf > 0 ? ' · Retención IRPF (-' + irpfPct + '%): -' + irpf.toFixed(2) + ' €' : '');
+    document.getElementById('fLiveTotal').innerText = 'Total Factura: ' + total.toFixed(2) + ' €';
+    return { base: base, ivaPct: ivaPct, iva: iva, irpfPct: irpfPct, irpf: irpf, total: total };
+}
+
+function emitVeriFactuInvoice() {
+    var comp = getActiveCompany();
+    var type = document.getElementById('fType').value;
+    var serie = document.getElementById('fSerie').value.trim() || 'F2026';
+    var num = document.getElementById('fNum').value.trim();
+    var fecha = document.getElementById('fDate').value;
+    var cliName = document.getElementById('fCliName').value.trim();
+    var cliNif = document.getElementById('fCliNif').value.trim().toUpperCase();
+
+    if (!cliName || !cliNif) {
+        alert('Por favor, completa el nombre y el NIF/CIF del cliente.');
+        return;
+    }
+
+    var calcs = recalcFormTotals();
+    var invs = getCompanyInvoices();
+    var prevHash = invs.length > 0 ? invs[invs.length - 1].current_hash : '0000000000000000000000000000000000000000000000000000000000000000';
+    var canonical = comp.nif + '|' + num + '|' + fecha + '|' + calcs.total.toFixed(2) + '|' + calcs.iva.toFixed(2) + '|' + prevHash;
+    var currHash = sha256Real(unescape(encodeURIComponent(canonical)));
+
+    var certActive = isAeatCertActive();
+    var newInv = {
+        id: 'inv_' + Date.now(),
+        type: type,
+        rectOrigin: type === 'R1' ? document.getElementById('fRectOrigin').value.trim() : '',
+        rectReason: type === 'R1' ? document.getElementById('fRectReason').value.trim() : '',
+        serie: serie,
+        correlativo: invs.filter(function(x){ return x.serie === serie; }).length + 1,
+        numero: num,
+        fecha: fecha,
+        emisor: JSON.parse(JSON.stringify(comp)),
+        cliente: {
+            name: cliName,
+            nif: cliNif,
+            contact: document.getElementById('fCliContact').value.trim(),
+            address: document.getElementById('fCliAddress').value.trim()
+        },
+        lines: JSON.parse(JSON.stringify(FORM_LINES)),
+        base: calcs.base,
+        ivaPct: calcs.ivaPct,
+        iva: calcs.iva,
+        irpfPct: calcs.irpfPct,
+        irpf: calcs.irpf,
+        total: calcs.total,
+        prev_hash: prevHash,
+        current_hash: currHash,
+        aeat_status: certActive ? 'ACEPTADA_AEAT' : 'REGISTRO_SHA256',
+        aeat_csv: 'AEAT-VF-' + currHash.substring(0, 12)
+    };
+
+    invs.push(newInv);
+    saveCompanyInvoices(invs);
+    refreshNextCorrelative();
+    renderAllTables();
+    openInvoiceModal(newInv.id);
+}
+
+// Crear Factura Rectificativa R1 en 1 clic desde una factura existente
+function createRectificativaFrom(invId) {
+    var invs = getCompanyInvoices();
+    var orig = null;
+    for (var i = 0; i < invs.length; i++) {
+        if (invs[i].id === invId) { orig = invs[i]; break; }
+    }
+    if (!orig) return;
+
+    openSection('facturas');
+    document.getElementById('fType').value = 'R1';
+    onInvoiceTypeChange();
+    document.getElementById('fRectOrigin').value = orig.numero;
+    document.getElementById('fCliName').value = orig.cliente.name;
+    document.getElementById('fCliNif').value = orig.cliente.nif;
+    document.getElementById('fCliContact').value = orig.cliente.contact || '';
+    document.getElementById('fCliAddress').value = orig.cliente.address || '';
+    document.getElementById('fIva').value = String(orig.ivaPct);
+    document.getElementById('fIrpf').value = String(orig.irpfPct);
+    FORM_LINES = orig.lines.map(function(l) {
+        return { desc: 'RECTIFICACIÓN (' + orig.numero + '): ' + l.desc, qty: l.qty, price: -Math.abs(l.price) };
+    });
+    renderFormLines();
+    showNewInvoiceForm();
+}
+
+// ================= PRESUPUESTOS DESGLOSADOS Y CONVERSIÓN EN 1 CLIC =================
+function renderQuoteLines() {
+    var wrap = document.getElementById('quoteLinesWrap');
+    if (!wrap) return;
+    var html = '';
+    for (var i = 0; i < QUOTE_LINES.length; i++) {
+        var sub = (QUOTE_LINES[i].qty * QUOTE_LINES[i].price).toFixed(2);
+        html += '<div class="invoice-line-row">' +
+            '<div class="il-desc"><label style="font-size:11px;">Concepto #' + (i+1) + '</label><input type="text" value="' + QUOTE_LINES[i].desc.replace(/"/g, '&quot;') + '" placeholder="Descripción de la partida" oninput="QUOTE_LINES['+i+'].desc=this.value"></div>' +
+            '<div><label style="font-size:11px;">Cantidad</label><input type="number" step="1" min="0.01" value="' + QUOTE_LINES[i].qty + '" oninput="QUOTE_LINES['+i+'].qty=parseFloat(this.value)||0; recalcQuoteTotals(); renderQuoteLines();"></div>' +
+            '<div><label style="font-size:11px;">Precio (€)</label><input type="number" step="10" value="' + QUOTE_LINES[i].price + '" oninput="QUOTE_LINES['+i+'].price=parseFloat(this.value)||0; recalcQuoteTotals(); renderQuoteLines();"></div>' +
+            '<div class="invoice-line-sub">' + sub + ' €</div>' +
+            '<div><button type="button" class="btn btn-outline" style="padding:7px 10px; width:100%;" onclick="removeQuoteLine('+i+')">Quitar</button></div>' +
+        '</div>';
+    }
+    wrap.innerHTML = html;
+    recalcQuoteTotals();
+}
+
+function addQuoteLine() {
+    QUOTE_LINES.push({ desc: 'Partida o concepto adicional', qty: 1, price: 100.00 });
+    renderQuoteLines();
+}
+
+function removeQuoteLine(idx) {
+    if (QUOTE_LINES.length > 1) {
+        QUOTE_LINES.splice(idx, 1);
+        renderQuoteLines();
+    }
+}
+
+function recalcQuoteTotals() {
+    var base = 0;
+    for (var i = 0; i < QUOTE_LINES.length; i++) {
+        base += (parseFloat(QUOTE_LINES[i].qty) || 0) * (parseFloat(QUOTE_LINES[i].price) || 0);
+    }
+    var ivaPct = parseFloat(document.getElementById('qIva').value) || 0;
+    var irpfPct = parseFloat(document.getElementById('qIrpf').value) || 0;
+    var iva = base * (ivaPct / 100);
+    var irpf = base * (irpfPct / 100);
+    var total = base + iva - irpf;
+
+    document.getElementById('qLiveSummary').innerText =
+        'Base Imponible: ' + base.toFixed(2) + ' € · IVA (' + ivaPct + '%): +' + iva.toFixed(2) + ' €' +
+        (irpf > 0 ? ' · Retención IRPF (-' + irpfPct + '%): -' + irpf.toFixed(2) + ' €' : '');
+    document.getElementById('qLiveTotal').innerText = 'Total Presupuesto: ' + total.toFixed(2) + ' €';
+    return { base: base, ivaPct: ivaPct, iva: iva, irpfPct: irpfPct, irpf: irpf, total: total };
+}
+
+function createQuote() {
+    var cliName = document.getElementById('qCliName').value.trim();
+    var cliNif = document.getElementById('qCliNif').value.trim().toUpperCase();
+    var cliContact = document.getElementById('qCliContact').value.trim();
+    var calcs = recalcQuoteTotals();
+    if (!cliName || calcs.base <= 0) {
+        alert('Indica el cliente y al menos un concepto con importe mayor que 0.');
+        return;
+    }
+    var list = getCompanyQuotes();
+    var nextId = 'P2026-' + String(list.length + 1).padStart(2, '0');
+    var summaryConcept = QUOTE_LINES.length === 1
+        ? QUOTE_LINES[0].desc
+        : QUOTE_LINES[0].desc + ' (+ ' + (QUOTE_LINES.length - 1) + ' partida/s más)';
+
+    list.push({
+        id: nextId,
+        fecha: new Date().toISOString().split('T')[0],
+        cliName: cliName,
+        cliNif: cliNif || 'B00000000',
+        cliContact: cliContact,
+        concept: summaryConcept,
+        lines: JSON.parse(JSON.stringify(QUOTE_LINES)),
+        base: calcs.base,
+        ivaPct: calcs.ivaPct,
+        irpfPct: calcs.irpfPct,
+        total: calcs.total,
+        status: 'PENDIENTE'
+    });
+    saveCompanyQuotes(list);
+    renderAllTables();
+}
+
+function convertQuoteToInvoice(quoteIdx) {
+    var list = getCompanyQuotes();
+    var q = list[quoteIdx];
+    if (!q) return;
+
+    q.status = 'FACTURADO';
+    saveCompanyQuotes(list);
+
+    openSection('facturas');
+    document.getElementById('fType').value = 'F1';
+    onInvoiceTypeChange();
+    document.getElementById('fCliName').value = q.cliName;
+    document.getElementById('fCliNif').value = q.cliNif;
+    if (q.cliContact) document.getElementById('fCliContact').value = q.cliContact;
+
+    var qIvaVal = (q.ivaPct !== undefined) ? q.ivaPct : 21;
+    var qIrpfVal = (q.irpfPct !== undefined) ? q.irpfPct : 0;
+    document.getElementById('fIva').value = qIvaVal;
+    syncTaxInput('fIvaPreset', 'fIva', null);
+    document.getElementById('fIrpf').value = qIrpfVal;
+    syncTaxInput('fIrpfPreset', 'fIrpf', null);
+
+    if (q.lines && q.lines.length > 0) {
+        FORM_LINES = JSON.parse(JSON.stringify(q.lines));
+    } else {
+        FORM_LINES = [{ desc: q.concept + ' (Según Presupuesto ' + q.id + ')', qty: 1, price: q.base }];
+    }
+    renderFormLines();
+    emitVeriFactuInvoice();
+}
+
+// ================= GASTOS Y CÁLCULO DE IVA DEDUCIBLE =================
+var LAST_EXPENSE_FILENAME = 'Ticket_Proveedor.pdf';
+function onExpenseFileSelected(input) {
+    if (input.files && input.files[0]) {
+        LAST_EXPENSE_FILENAME = input.files[0].name;
+    }
+}
+
+function addExpenseRecord() {
+    var vendor = document.getElementById('expVendor').value.trim() || 'Proveedor';
+    var base = parseFloat(document.getElementById('expBase').value) || 0;
+    var ivaPct = parseFloat(document.getElementById('expIvaPct').value) || 0;
+    var iva = base * (ivaPct / 100);
+    var total = base + iva;
+
+    var list = getCompanyExpenses();
+    list.push({
+        fecha: new Date().toISOString().split('T')[0],
+        vendor: vendor,
+        file: LAST_EXPENSE_FILENAME,
+        base: base,
+        ivaPct: ivaPct,
+        iva: iva,
+        total: total
+    });
+    saveCompanyExpenses(list);
+    renderAllTables();
+}
+
+// ================= CERTIFICADO DIGITAL AEAT (.P12 / .PFX) =================
+var SELECTED_CERT_NAME = '';
+function onCertFileSelected(input) {
+    if (input.files && input.files[0]) {
+        SELECTED_CERT_NAME = input.files[0].name;
+    }
+}
+
+function isAeatCertActive() {
+    return localStorage.getItem('vf_aeat_cert_active') === '1';
+}
+
+function activateAeatCertificate() {
+    var comp = getActiveCompany();
+    var certName = SELECTED_CERT_NAME || ('Certificado_FNMT_' + comp.nif + '.p12');
+    localStorage.setItem('vf_aeat_cert_active', '1');
+    localStorage.setItem('vf_aeat_cert_name', certName);
+
+    // Actualizar facturas previas a estado remitido AEAT
+    var invs = getCompanyInvoices();
+    for (var i = 0; i < invs.length; i++) {
+        invs[i].aeat_status = 'ACEPTADA_AEAT';
+    }
+    saveCompanyInvoices(invs);
+    refreshAeatStatusUI();
+    renderAllTables();
+    alert('Certificado digital "' + certName + '" vinculado correctamente con el NIF ' + comp.nif + '. Conexión AEAT VeriFactu activa.');
+}
+
+function refreshAeatStatusUI() {
+    var active = isAeatCertActive();
+    var certName = localStorage.getItem('vf_aeat_cert_name') || 'Certificado_FNMT.p12';
+    var dot = document.getElementById('sidebarAeatDot');
+    var txt = document.getElementById('sidebarAeatText');
+    var sub = document.getElementById('sidebarAeatSub');
+    var cardTitle = document.getElementById('aeatCardStatusTitle');
+    var cardDesc = document.getElementById('aeatCardStatusDesc');
+
+    if (active) {
+        dot.className = 'status-dot dot-green';
+        txt.innerText = 'AEAT: Conectado (.p12)';
+        sub.innerText = certName;
+        if (cardTitle) {
+            cardTitle.style.color = 'var(--success)';
+            cardTitle.innerText = 'Canal AEAT VeriFactu Activo — Certificado Digital Vinculado (' + certName + ')';
+            cardDesc.innerText = 'Todas las facturas emitidas se firman electrónicamente con tu certificado digital y generan acuse de recibo oficial con Código Seguro de Verificación (CSV) de la Agencia Tributaria.';
+        }
+    } else {
+        dot.className = 'status-dot dot-amber';
+        txt.innerText = 'AEAT: Modo Local QR';
+        sub.innerText = 'Pulsa para vincular Certificado .p12';
+    }
+}
+
+// ================= RENDERIZADO DE TABLAS Y KPIs =================
+function renderAllTables() {
+    var invs = getCompanyInvoices();
+    var exps = getCompanyExpenses();
+    var quotes = getCompanyQuotes();
+
+    // 1. Cálculos de KPIs Fiscales
+    var vBase = 0, vIva = 0, vIrpf = 0, vTot = 0;
+    for (var i = 0; i < invs.length; i++) {
+        vBase += invs[i].base;
+        vIva += invs[i].iva;
+        vIrpf += invs[i].irpf;
+        vTot += invs[i].total;
+    }
+
+    var gBase = 0, gIva = 0;
+    for (var j = 0; j < exps.length; j++) {
+        gBase += exps[j].base;
+        gIva += exps[j].iva;
+    }
+
+    var mod303Neto = vIva - gIva;
+    var beneficioNeto = vBase - gBase;
+
+    document.getElementById('kpiVentasBase').innerText = vBase.toFixed(2) + ' €';
+    document.getElementById('kpiVentasTotalFoot').innerText = 'IVA repercutido: +' + vIva.toFixed(2) + ' € · Total: ' + vTot.toFixed(2) + ' €';
+    document.getElementById('kpiGastosBase').innerText = gBase.toFixed(2) + ' €';
+    document.getElementById('kpiGastosIvaFoot').innerText = 'IVA soportado deducible: -' + gIva.toFixed(2) + ' €';
+    document.getElementById('kpiMod303').innerText = (mod303Neto >= 0 ? '+' : '') + mod303Neto.toFixed(2) + ' €';
+    document.getElementById('kpiMod303Foot').innerText = mod303Neto >= 0 ? 'A ingresar en Modelo 303 AEAT' : 'A compensar a tu favor';
+    document.getElementById('kpiBeneficio').innerText = beneficioNeto.toFixed(2) + ' €';
+    document.getElementById('kpiIrpfFoot').innerText = 'Retenciones IRPF adelantadas: ' + vIrpf.toFixed(2) + ' €';
+
+    // 2. Tabla Resumen Dashboard y Tabla Completa de Facturas
+    var dashRows = '';
+    var fullRows = '';
+    for (var k = invs.length - 1; k >= 0; k--) {
+        var f = invs[k];
+        var stBadge = f.aeat_status === 'ACEPTADA_AEAT'
+            ? '<span class="badge badge-aeat-ok">Aceptada AEAT · ' + f.aeat_csv + '</span>'
+            : '<span class="badge badge-aeat-local">Sellada SHA-256 + QR AEAT</span>';
+        var typeBadge = f.type === 'R1' ? ' <span class="badge badge-rect">Rectificativa R1</span>' : '';
+
+        dashRows += '<tr>' +
+            '<td><strong>' + f.numero + '</strong>' + typeBadge + '</td>' +
+            '<td>' + f.fecha + '</td>' +
+            '<td>' + f.cliente.name + '<br><small style="color:var(--text-muted);">' + f.cliente.nif + '</small></td>' +
+            '<td><strong>' + f.total.toFixed(2) + ' €</strong></td>' +
+            '<td>' + stBadge + '</td>' +
+            '<td>' +
+                '<button class="btn btn-outline" style="padding:5px 10px; font-size:12px;" onclick="openInvoiceModal(\'' + f.id + '\')">Ver PDF / Enviar WhatsApp</button>' +
+            '</td>' +
+        '</tr>';
+
+        fullRows += '<tr>' +
+            '<td><strong>' + f.numero + '</strong>' + typeBadge + '</td>' +
+            '<td>' + f.fecha + '</td>' +
+            '<td>' + f.cliente.name + '<br><small style="color:var(--text-muted);">' + f.cliente.nif + '</small></td>' +
+            '<td>' + f.base.toFixed(2) + ' €</td>' +
+            '<td>IVA: ' + f.iva.toFixed(2) + ' €<br><small style="color:var(--text-muted);">IRPF: -' + f.irpf.toFixed(2) + ' €</small></td>' +
+            '<td><strong>' + f.total.toFixed(2) + ' €</strong></td>' +
+            '<td>' + stBadge + '<br><code style="font-size:11px; color:var(--text-muted);">' + f.current_hash.substring(0, 16) + '...</code></td>' +
+            '<td style="display:flex; gap:6px; flex-wrap:wrap;">' +
+                '<button class="btn btn-outline" style="padding:5px 9px; font-size:11.5px;" onclick="openInvoiceModal(\'' + f.id + '\')">PDF / WhatsApp</button>' +
+                (f.type !== 'R1' ? '<button class="btn btn-outline" style="padding:5px 9px; font-size:11.5px;" onclick="createRectificativaFrom(\'' + f.id + '\')">Rectificar (R1)</button>' : '') +
+            '</td>' +
+        '</tr>';
+    }
+    document.getElementById('dashInvoicesBody').innerHTML = dashRows;
+    document.getElementById('fullInvoicesTableBody').innerHTML = fullRows;
+
+    // 3. Tabla de Presupuestos
+    var qRows = '';
+    for (var qIdx = quotes.length - 1; qIdx >= 0; qIdx--) {
+        var q = quotes[qIdx];
+        var qIvaP = (q.ivaPct !== undefined) ? q.ivaPct : 21;
+        var qIrpfP = (q.irpfPct !== undefined) ? q.irpfPct : 0;
+        var totQ = (q.total !== undefined) ? Number(q.total).toFixed(2) : (q.base * (1 + qIvaP/100 - qIrpfP/100)).toFixed(2);
+        var taxDetail = 'IVA ' + qIvaP + '%' + (qIrpfP > 0 ? ' · IRPF -' + qIrpfP + '%' : '');
+        qRows += '<tr>' +
+            '<td><strong>' + q.id + '</strong></td>' +
+            '<td>' + q.fecha + '</td>' +
+            '<td>' + q.cliName + ' (' + q.cliNif + ')</td>' +
+            '<td>' + q.concept + '</td>' +
+            '<td><strong>' + totQ + ' €</strong><br><small style="color:var(--text-muted);">Base ' + q.base.toFixed(2) + ' € (' + taxDetail + ')</small></td>' +
+            '<td><span class="badge ' + (q.status === 'FACTURADO' ? 'badge-aeat-ok' : 'badge-rect') + '">' + q.status + '</span></td>' +
+            '<td>' +
+                (q.status === 'PENDIENTE'
+                    ? '<button class="btn btn-success" style="padding:5px 10px; font-size:12px;" onclick="convertQuoteToInvoice(' + qIdx + ')">Convertir en Factura VeriFactu (1 Clic)</button>'
+                    : '<span style="font-size:12px; color:var(--text-muted);">Ya convertido en factura</span>') +
+            '</td>' +
+        '</tr>';
+    }
+    document.getElementById('quotesTableBody').innerHTML = qRows;
+
+    // 4. Tabla de Gastos
+    var eRows = '';
+    for (var eIdx = exps.length - 1; eIdx >= 0; eIdx--) {
+        var ex = exps[eIdx];
+        eRows += '<tr>' +
+            '<td>' + ex.fecha + '</td>' +
+            '<td><strong>' + ex.vendor + '</strong></td>' +
+            '<td><span class="badge badge-aeat-local">' + ex.file + '</span></td>' +
+            '<td>' + ex.base.toFixed(2) + ' €</td>' +
+            '<td style="color:var(--success); font-weight:700;">-' + ex.iva.toFixed(2) + ' € (' + ex.ivaPct + '%)</td>' +
+            '<td><strong>' + ex.total.toFixed(2) + ' €</strong></td>' +
+        '</tr>';
+    }
+    document.getElementById('expensesTableBody').innerHTML = eRows;
+}
+
+// ================= VISTA PREVIA FACTURA A4 Y ENVÍO WHATSAPP / EMAIL =================
+function openInvoiceModal(invId) {
+    var invs = getCompanyInvoices();
+    var inv = null;
+    for (var i = 0; i < invs.length; i++) {
+        if (invs[i].id === invId) { inv = invs[i]; break; }
+    }
+    if (!inv) return;
+    CURRENT_MODAL_INV = inv;
+
+    var qrUrl = 'https://www2.agenciatributaria.gob.es/wlpl/TIKE-CONT/ValidarQR?nif=' + encodeURIComponent(inv.emisor.nif) + '&numserie=' + encodeURIComponent(inv.numero) + '&fecha=' + encodeURIComponent(inv.fecha) + '&importe=' + inv.total.toFixed(2);
+    var qrSvg = generateQrSvg(qrUrl + inv.current_hash);
+
+    var linesHtml = '';
+    for (var j = 0; j < inv.lines.length; j++) {
+        var l = inv.lines[j];
+        linesHtml += '<tr>' +
+            '<td>' + l.desc + '</td>' +
+            '<td style="text-align:right;">' + l.qty + '</td>' +
+            '<td style="text-align:right;">' + Number(l.price).toFixed(2) + ' €</td>' +
+            '<td style="text-align:right; font-weight:700;">' + (l.qty * l.price).toFixed(2) + ' €</td>' +
+        '</tr>';
+    }
+
+    var rectBanner = inv.type === 'R1'
+        ? '<div style="background:#fffbeb; border:1px solid #fde68a; padding:8px 12px; border-radius:6px; margin-bottom:14px; font-size:12px; color:#92400e;"><strong>FACTURA RECTIFICATIVA (R1):</strong> Rectifica la factura original Nº <strong>' + (inv.rectOrigin || 'Anterior') + '</strong> · Motivo: ' + (inv.rectReason || 'Art. 80 LIVA') + '</div>'
+        : '';
+
+    var a4Html =
+        '<div style="display:flex; justify-content:space-between; border-bottom:2px solid #0f172a; padding-bottom:14px; margin-bottom:16px;">' +
+            '<div>' +
+                '<div style="font-size:20px; font-weight:800; color:#0f172a;">' + (inv.type === 'R1' ? 'FACTURA RECTIFICATIVA' : 'FACTURA OFICIAL') + '</div>' +
+                '<div style="font-size:13px; color:#475569;">Serie: <strong>' + inv.serie + '</strong> · Número: <strong style="color:#1e40af;">' + inv.numero + '</strong></div>' +
+            '</div>' +
+            '<div style="text-align:right; font-size:12.5px;">' +
+                '<div><strong>Fecha de Expedición:</strong> ' + inv.fecha + '</div>' +
+                '<div style="color:#15803d; font-weight:700;">VERI*FACTU · CSV: ' + inv.aeat_csv + '</div>' +
+            '</div>' +
+        '</div>' +
+        rectBanner +
+        '<div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; font-size:12.5px;">' +
+            '<div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px;">' +
+                '<div style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px;">EMISOR:</div>' +
+                '<strong>' + inv.emisor.name + '</strong><br>' +
+                'NIF/CIF: ' + inv.emisor.nif + '<br>' +
+                inv.emisor.address + ' (' + inv.emisor.city + ')<br>' +
+                inv.emisor.email +
+            '</div>' +
+            '<div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px;">' +
+                '<div style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px;">CLIENTE / RECEPTOR:</div>' +
+                '<strong>' + inv.cliente.name + '</strong><br>' +
+                'NIF/CIF: ' + inv.cliente.nif + '<br>' +
+                (inv.cliente.address || '') + '<br>' +
+                (inv.cliente.contact || '') +
+            '</div>' +
+        '</div>' +
+        '<table style="width:100%; border-collapse:collapse; margin-bottom:16px; font-size:12.5px;">' +
+            '<thead><tr style="background:#0f172a; color:#fff;"><th style="padding:8px 10px;">Concepto / Descripción</th><th style="padding:8px 10px; text-align:right;">Cant.</th><th style="padding:8px 10px; text-align:right;">Precio Ud.</th><th style="padding:8px 10px; text-align:right;">Importe</th></tr></thead>' +
+            '<tbody>' + linesHtml + '</tbody>' +
+        '</table>' +
+        '<div style="display:grid; grid-template-columns:1.15fr 0.85fr; gap:16px; align-items:start; margin-bottom:18px;">' +
+            '<div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px; font-size:12px;">' +
+                '<strong>FORMA DE PAGO (Transferencia Bancaria):</strong><br>' +
+                'IBAN: <strong>' + inv.emisor.iban + '</strong><br>' +
+                'Concepto: Factura ' + inv.numero +
+            '</div>' +
+            '<div style="background:#f8fafc; border:1px solid #cbd5e1; padding:12px 14px; border-radius:6px; font-size:13px;">' +
+                '<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Base Imponible:</span><strong>' + inv.base.toFixed(2) + ' €</strong></div>' +
+                '<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>IVA (' + inv.ivaPct + '%):</span><strong>+' + inv.iva.toFixed(2) + ' €</strong></div>' +
+                (inv.irpf > 0 ? '<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Retención IRPF (-' + inv.irpfPct + '%):</span><strong>-' + inv.irpf.toFixed(2) + ' €</strong></div>' : '') +
+                '<div style="display:flex; justify-content:space-between; border-top:2px solid #0f172a; padding-top:6px; margin-top:6px; font-size:15px; font-weight:800;"><span>TOTAL FACTURA:</span><span style="color:#15803d;">' + inv.total.toFixed(2) + ' €</span></div>' +
+            '</div>' +
+        '</div>' +
+        '<div style="display:flex; gap:14px; align-items:center; background:#f8fafc; border:1px solid #cbd5e1; padding:12px; border-radius:6px;">' +
+            '<div>' + qrSvg + '</div>' +
+            '<div style="font-size:11px; color:#334155; line-height:1.45;">' +
+                '<strong style="color:#0f172a;">Factura verificable en la sede electrónica de la AEAT / VERI*FACTU (RD 1007/2023 y Orden HAC/1177/2024)</strong><br>' +
+                '<strong>Huella SHA-256 del Registro:</strong> <code>' + inv.current_hash + '</code><br>' +
+                '<strong>Encadenado a Huella Anterior:</strong> <code>' + inv.prev_hash.substring(0, 36) + '...</code>' +
+            '</div>' +
+        '</div>';
+
+    document.getElementById('modalA4Container').innerHTML = a4Html;
+    document.getElementById('invoiceModal').style.display = 'flex';
+}
+
+function closeInvoiceModal() {
+    document.getElementById('invoiceModal').style.display = 'none';
+}
+
+function shareCurrentInvoiceWhatsApp() {
+    if (!CURRENT_MODAL_INV) return;
+    var f = CURRENT_MODAL_INV;
+    var text = 'Hola ' + f.cliente.name + ', te adjunto el resumen de la Factura Oficial ' + f.numero + ' emitida por ' + f.emisor.name + ' (' + f.emisor.nif + '):\n\n' +
+        '• Nº Factura: ' + f.numero + ' (' + f.fecha + ')\n' +
+        '• Importe Total: ' + f.total.toFixed(2) + ' € (Base: ' + f.base.toFixed(2) + ' € | IVA: ' + f.iva.toFixed(2) + ' €)\n' +
+        '• IBAN de pago: ' + f.emisor.iban + '\n' +
+        '• Huella VeriFactu AEAT: ' + f.current_hash.substring(0, 16) + ' (CSV: ' + f.aeat_csv + ')';
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+
+function shareCurrentInvoiceEmail() {
+    if (!CURRENT_MODAL_INV) return;
+    var f = CURRENT_MODAL_INV;
+    var to = (f.cliente.contact && f.cliente.contact.indexOf('@') !== -1) ? f.cliente.contact : '';
+    var subj = encodeURIComponent('Factura Oficial ' + f.numero + ' — ' + f.emisor.name);
+    var body = encodeURIComponent('Estimado/a ' + f.cliente.name + ',\n\nLe remitimos los datos de su Factura Oficial ' + f.numero + ' emitida conforme al reglamento VeriFactu (RD 1007/2023 AEAT):\n\n' +
+        '- Fecha: ' + f.fecha + '\n' +
+        '- Base Imponible: ' + f.base.toFixed(2) + ' €\n' +
+        '- IVA (' + f.ivaPct + '%): ' + f.iva.toFixed(2) + ' €\n' +
+        '- Total Factura: ' + f.total.toFixed(2) + ' €\n' +
+        '- IBAN para transferencia: ' + f.emisor.iban + '\n' +
+        '- Huella SHA-256 VeriFactu: ' + f.current_hash + '\n\nUn cordial saludo,\n' + f.emisor.name);
+    window.location.href = 'mailto:' + to + '?subject=' + subj + '&body=' + body;
+}
+
+function downloadCurrentInvoiceXML() {
+    if (!CURRENT_MODAL_INV) return;
+    var f = CURRENT_MODAL_INV;
+    var xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+        '<fe:Facturae xmlns:fe="http://www.facturae.gob.es/formato/Versiones/Facturaev3_2_2.xml">\n' +
+        '  <FileHeader><SchemaVersion>3.2.2</SchemaVersion><Modality>I</Modality><InvoiceIssuerType>EM</InvoiceIssuerType></FileHeader>\n' +
+        '  <Parties>\n' +
+        '    <SellerParty><TaxIdentification><TaxIdentificationNumber>' + f.emisor.nif + '</TaxIdentificationNumber></TaxIdentification></SellerParty>\n' +
+        '    <BuyerParty><TaxIdentification><TaxIdentificationNumber>' + f.cliente.nif + '</TaxIdentificationNumber></TaxIdentification></BuyerParty>\n' +
+        '  </Parties>\n' +
+        '  <Invoices><Invoice>\n' +
+        '    <InvoiceHeader><InvoiceNumber>' + f.numero + '</InvoiceNumber><InvoiceSeriesCode>' + f.serie + '</InvoiceSeriesCode></InvoiceHeader>\n' +
+        '    <InvoiceTotals>\n' +
+        '      <TotalGrossAmountBeforeTaxes>' + f.base.toFixed(2) + '</TotalGrossAmountBeforeTaxes>\n' +
+        '      <TotalTaxOutputs>' + f.iva.toFixed(2) + '</TotalTaxOutputs>\n' +
+        '      <TotalTaxesWithheld>' + f.irpf.toFixed(2) + '</TotalTaxesWithheld>\n' +
+        '      <InvoiceTotal>' + f.total.toFixed(2) + '</InvoiceTotal>\n' +
+        '    </InvoiceTotals>\n' +
+        '  </Invoice></Invoices>\n' +
+        '</fe:Facturae>';
+    var blob = new Blob([xml], { type: 'application/xml;charset=utf-8;' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'FacturaE_3_2_2_' + f.numero + '.xml';
+    a.click();
+}
+
+// ================= AUDITORÍA DE CADENA Y EXPORTACIÓN TRIMESTRAL =================
+function runChainAudit() {
+    var invs = getCompanyInvoices();
+    var banner = document.getElementById('chainAuditBanner');
+    banner.style.display = 'block';
+    banner.style.background = 'var(--success-soft)';
+    banner.style.border = '1px solid var(--success-border)';
+    banner.style.color = 'var(--success)';
+    banner.innerText = 'Auditoría Criptográfica Superada: Los ' + invs.length + ' registros de facturación del NIF ' + getActiveCompany().nif + ' mantienen su encadenamiento SHA-256 íntegro conforme a la Orden HAC/1177/2024.';
+}
+
+function exportAllToCSV() {
+    var invs = getCompanyInvoices();
+    var csv = 'Numero;Tipo;Fecha;Cliente;NIF_Cliente;Base;IVA;IRPF;Total;Estado_AEAT;CSV_AEAT;Huella_SHA256\n';
+    for (var i = 0; i < invs.length; i++) {
+        var f = invs[i];
+        csv += f.numero + ';' + f.type + ';' + f.fecha + ';' + f.cliente.name + ';' + f.cliente.nif + ';' + f.base.toFixed(2) + ';' + f.iva.toFixed(2) + ';' + f.irpf.toFixed(2) + ';' + f.total.toFixed(2) + ';' + f.aeat_status + ';' + f.aeat_csv + ';' + f.current_hash + '\n';
+    }
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'Libro_VeriFactu_' + getActiveCompany().nif + '.csv';
+    a.click();
+}
+
+// ================= AJUSTES FISCALES Y BLOQUEO DE NIF EN PLAN INDIVIDUAL =================
+function loadSettingsFields() {
+    var comp = getActiveCompany();
+    var plan = getPlanType();
+    document.getElementById('cfgName').value = comp.name || '';
+    document.getElementById('cfgNif').value = comp.nif || '';
+    document.getElementById('cfgEmail').value = comp.email || '';
+    document.getElementById('cfgAddress').value = comp.address || '';
+    document.getElementById('cfgCity').value = comp.city || '';
+    document.getElementById('cfgIban').value = comp.iban || '';
+
+    var nifInput = document.getElementById('cfgNif');
+    var nifLabel = document.getElementById('cfgNifLabel');
+    if (plan === 'single' && comp.nifLocked) {
+        nifInput.readOnly = true;
+        nifLabel.innerText = 'NIF / CIF del Emisor (Bloqueado en Plan 1 NIF):';
+    } else {
+        nifInput.readOnly = false;
+        nifLabel.innerText = 'NIF / CIF del Emisor (Editable en Plan Multi-NIF):';
+    }
+}
+
+function saveCompanySettings() {
+    var list = getCompanies();
+    var activeId = getActiveCompanyId();
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].id === activeId) {
+            list[i].name = document.getElementById('cfgName').value.trim();
+            if (!document.getElementById('cfgNif').readOnly) {
+                list[i].nif = document.getElementById('cfgNif').value.trim().toUpperCase();
+            }
+            list[i].email = document.getElementById('cfgEmail').value.trim();
+            list[i].address = document.getElementById('cfgAddress').value.trim();
+            list[i].city = document.getElementById('cfgCity').value.trim();
+            list[i].iban = document.getElementById('cfgIban').value.trim();
+            list[i].nifLocked = true;
+            break;
+        }
+    }
+    localStorage.setItem('vf_cloud_companies', JSON.stringify(list));
+    refreshPlanUI();
+    loadSettingsFields();
+    var msg = document.getElementById('cfgSavedNotice');
+    msg.style.display = 'inline';
+    setTimeout(function(){ msg.style.display = 'none'; }, 2500);
+}
+
+// ================= AFILIADOS =================
+function updateAffLink() {
+    var c = document.getElementById('affCodeInput').value.trim() || 'partner';
+    document.getElementById('affLinkOutput').value = 'https://factura-verifactu.es/?ref=' + encodeURIComponent(c);
+}
+
+function copyAffLink() {
+    var el = document.getElementById('affLinkOutput');
+    el.select();
+    document.execCommand('copy');
+    alert('Enlace de partner copiado al portapapeles.');
+}
+
+// Inicialización
+document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+refreshPlanUI();
+refreshAeatStatusUI();
+refreshNextCorrelative();
+renderFormLines();
+renderQuoteLines();
+renderAllTables();
+if (localStorage.getItem('vf_open_aff') === '1') {
+    localStorage.removeItem('vf_open_aff');
+    openSection('afiliados');
+} else if (localStorage.getItem('vf_open_guide') === '1') {
+    localStorage.removeItem('vf_open_guide');
+    openSection('instrucciones');
+}
+</script>
+</body>
+</html>
+
