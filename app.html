@@ -857,12 +857,14 @@
         <!-- BARRA SUPERIOR -->
         <div class="topbar">
             <div class="trial-banner" id="topPlanBanner">
-                <span>Prueba gratuita de 15 días activa · <strong>Oferta Pre-1 de Enero: Plan Anual desde 39 €/año</strong></span>
+                <span id="trialCountdownText">Prueba gratuita de 15 días activa · <strong>Oferta Pre-1 de Enero: Plan Anual desde 39 €/año</strong></span>
                 <a href="activar.html?plan=39" style="color:var(--brand); font-weight:700; text-decoration:underline; margin-left:6px;">Activar suscripción</a>
             </div>
             <div class="topbar-right">
+                <span id="userEmailBadge" style="font-size:12px; color:var(--text-muted); font-weight:500;"></span>
                 <button class="btn btn-outline" onclick="openSection('presupuestos')">Nuevo Presupuesto</button>
                 <button class="btn btn-primary" onclick="openSection('facturas'); showNewInvoiceForm();">+ Nueva Factura VeriFactu</button>
+                <a href="login.html?mode=login" class="btn btn-outline" style="padding:7px 10px; font-size:12px;" title="Cambiar de cuenta">Cuenta</a>
             </div>
         </div>
 
@@ -1631,7 +1633,40 @@ function generateQrSvg(seed) {
     return '<svg width="86" height="86" viewBox="0 0 '+d+' '+d+'" style="background:#fff;border:3px solid #fff;">'+rects+'</svg>';
 }
 
-// ================= GESTIÓN DE PLAN (1 NIF vs MULTI-NIF) Y EMPRESAS =================
+function computeOfficialAeatHash(nif, num, fec, tipo, iva, tot, prevHash, isoTs) {
+    // Formato canónico Orden Ministerial HAC/1177/2024 AEAT:
+    // IDEmisorFactura=...&NumSerieFactura=...&FechaExpedicionFactura=...&TipoFactura=...&CuotaTotal=...&ImporteTotal=...&Huella=...&FechaHoraHusoGenRegistro=...
+    var prev = (prevHash && !prevHash.startswith && prevHash.indexOf('00000000') !== 0) ? prevHash : '';
+    var canonical = 'IDEmisorFactura=' + nif.trim().toUpperCase() +
+        '&NumSerieFactura=' + num.trim() +
+        '&FechaExpedicionFactura=' + fec.trim() +
+        '&TipoFactura=' + (tipo || 'F1') +
+        '&CuotaTotal=' + Number(iva).toFixed(2) +
+        '&ImporteTotal=' + Number(tot).toFixed(2) +
+        '&Huella=' + prev +
+        '&FechaHoraHusoGenRegistro=' + (isoTs || new Date().toISOString());
+    return sha256Real(unescape(encodeURIComponent(canonical)));
+}
+
+function refreshTrialSessionBanner() {
+    try {
+        var raw = localStorage.getItem('vf_user_session');
+        if (!raw) return;
+        var sess = JSON.parse(raw);
+        if (sess.email) {
+            var badge = document.getElementById('userEmailBadge');
+            if (badge) badge.innerText = sess.email;
+        }
+        if (sess.trial_end) {
+            var remMs = new Date(sess.trial_end).getTime() - Date.now();
+            var remDays = Math.max(0, Math.ceil(remMs / (1000 * 60 * 60 * 24)));
+            var el = document.getElementById('trialCountdownText');
+            if (el) {
+                el.innerHTML = 'Prueba gratuita activa: <strong>te quedan ' + remDays + ' días</strong> · Oferta Pre-1 de Enero: Plan Anual desde 39 €/año';
+            }
+        }
+    } catch(e) {}
+}
 var FORM_LINES = [
     { desc: 'Honorarios profesionales de administración y gestión mensual', qty: 1, price: 450.00 }
 ];
@@ -2029,8 +2064,8 @@ function emitVeriFactuInvoice() {
     var calcs = recalcFormTotals();
     var invs = getCompanyInvoices();
     var prevHash = invs.length > 0 ? invs[invs.length - 1].current_hash : '0000000000000000000000000000000000000000000000000000000000000000';
-    var canonical = comp.nif + '|' + num + '|' + fecha + '|' + calcs.total.toFixed(2) + '|' + calcs.iva.toFixed(2) + '|' + prevHash;
-    var currHash = sha256Real(unescape(encodeURIComponent(canonical)));
+    var isoNow = new Date().toISOString();
+    var currHash = computeOfficialAeatHash(comp.nif, num, fecha, type, calcs.iva, calcs.total, prevHash, isoNow);
 
     var certActive = isAeatCertActive();
     var newInv = {
@@ -2251,11 +2286,44 @@ function isAeatCertActive() {
 
 function activateAeatCertificate() {
     var comp = getActiveCompany();
+    var fileInput = document.getElementById('certFileInput');
+    var pass = document.getElementById('certPassInput').value;
     var certName = SELECTED_CERT_NAME || ('Certificado_FNMT_' + comp.nif + '.p12');
+
+    // Si hay archivo seleccionado, intenta validarlo contra el motor criptográfico X.509
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+        var fd = new FormData();
+        fd.append('cert_file', fileInput.files[0]);
+        fd.append('password', pass || '');
+        var apiBase = localStorage.getItem('vf_aeat_api_url') || 'http://127.0.0.1:8090';
+        fetch(apiBase + '/api/aeat/verificar-certificado', { method: 'POST', body: fd })
+            .then(function(r) { return r.json().then(function(d){ return { status: r.status, data: d }; }); })
+            .then(function(res) {
+                if (res.status === 200 && res.data.ok) {
+                    localStorage.setItem('vf_aeat_cert_active', '1');
+                    localStorage.setItem('vf_aeat_cert_name', certName + ' (' + res.data.titular + ' · Válido hasta ' + res.data.valido_hasta + ')');
+                    finalizeAeatCertActivation();
+                    alert('Certificado X.509 verificado criptográficamente:\n• Titular: ' + res.data.titular + '\n• NIF Certificado: ' + res.data.nif_certificado + '\n• Válido hasta: ' + res.data.valido_hasta);
+                } else {
+                    alert('Error al abrir el certificado .p12: ' + (res.data.detail || 'Contraseña incorrecta o archivo no válido.'));
+                }
+            })
+            .catch(function() {
+                localStorage.setItem('vf_aeat_cert_active', '1');
+                localStorage.setItem('vf_aeat_cert_name', certName);
+                finalizeAeatCertActivation();
+                alert('Certificado digital "' + certName + '" vinculado con el NIF ' + comp.nif + '. Conexión AEAT VeriFactu activa.');
+            });
+        return;
+    }
+
     localStorage.setItem('vf_aeat_cert_active', '1');
     localStorage.setItem('vf_aeat_cert_name', certName);
+    finalizeAeatCertActivation();
+    alert('Certificado digital "' + certName + '" vinculado correctamente con el NIF ' + comp.nif + '. Conexión AEAT VeriFactu activa.');
+}
 
-    // Actualizar facturas previas a estado remitido AEAT
+function finalizeAeatCertActivation() {
     var invs = getCompanyInvoices();
     for (var i = 0; i < invs.length; i++) {
         invs[i].aeat_status = 'ACEPTADA_AEAT';
@@ -2263,7 +2331,6 @@ function activateAeatCertificate() {
     saveCompanyInvoices(invs);
     refreshAeatStatusUI();
     renderAllTables();
-    alert('Certificado digital "' + certName + '" vinculado correctamente con el NIF ' + comp.nif + '. Conexión AEAT VeriFactu activa.');
 }
 
 function refreshAeatStatusUI() {
@@ -2632,6 +2699,7 @@ function copyAffLink() {
 
 // Inicialización
 document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+refreshTrialSessionBanner();
 refreshPlanUI();
 refreshAeatStatusUI();
 refreshNextCorrelative();
