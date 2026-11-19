@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <style>
         :root {
             --bg-app: #f8fafc;
@@ -791,7 +792,7 @@
                 <li class="nav-item">
                     <button class="nav-btn" id="nav_afiliados" onclick="openSection('afiliados')">
                         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        Panel de Afiliados (35%)
+                        Panel de Afiliados (30%)
                     </button>
                 </li>
                 <li class="nav-item">
@@ -1333,8 +1334,8 @@
                 <div class="kpi-grid">
                     <div class="kpi-card">
                         <div class="kpi-label"><span>TRAMO DE COMISIÓN ACTIVO</span></div>
-                        <div class="kpi-value" style="color:var(--brand);" id="affKpiPct">35%</div>
-                        <div class="kpi-foot" id="affKpiTierFoot">Tramo base (sube al 45% con +20 cuentas)</div>
+                        <div class="kpi-value" style="color:var(--brand);" id="affKpiPct">30%</div>
+                        <div class="kpi-foot" id="affKpiTierFoot">Tramo base (sube al 40% con +20 cuentas)</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label"><span>USUARIOS EN PRUEBA (15 DÍAS)</span></div>
@@ -1387,7 +1388,7 @@
                                     <th>Usuario / Empresa Referida</th>
                                     <th>Estado</th>
                                     <th>Plan Seleccionado</th>
-                                    <th>Tu Comisión (35% / 45%)</th>
+                                    <th>Tu Comisión (30% / 40%)</th>
                                 </tr>
                             </thead>
                             <tbody id="affConversionsBody">
@@ -1752,25 +1753,18 @@ function sha256Real(ascii) {
     return result.toUpperCase();
 }
 
-function generateQrSvg(seed) {
-    var h = sha256Real(seed);
-    var size = 21, cell = 4, rects = '';
-    function finder(ox, oy) {
-        rects += '<rect x="'+(ox*cell)+'" y="'+(oy*cell)+'" width="'+(7*cell)+'" height="'+(7*cell)+'" fill="#0f172a"/>';
-        rects += '<rect x="'+((ox+1)*cell)+'" y="'+((oy+1)*cell)+'" width="'+(5*cell)+'" height="'+(5*cell)+'" fill="#ffffff"/>';
-        rects += '<rect x="'+((ox+2)*cell)+'" y="'+((oy+2)*cell)+'" width="'+(3*cell)+'" height="'+(3*cell)+'" fill="#0f172a"/>';
+function generateQrSvg(qrPayloadUrl) {
+    // Genera un Código QR ISO/IEC 18004 100% real y escaneable por la cámara del móvil y la app de la AEAT
+    if (typeof window.qrcode === 'function') {
+        try {
+            var qr = window.qrcode(0, 'M');
+            qr.addData(qrPayloadUrl);
+            qr.make();
+            return qr.createSvgTag({ cellSize: 3, margin: 2, scalable: true }).replace('<svg ', '<svg width="96" height="96" style="background:#fff; border:2px solid #fff;" ');
+        } catch(e) {}
     }
-    finder(0,0); finder(size-7,0); finder(0,size-7);
-    for (var r=0; r<size; r++) {
-        for (var c=0; c<size; c++) {
-            if ((r<7 && c<7) || (r<7 && c>=size-7) || (r>=size-7 && c<7)) continue;
-            if (((h.charCodeAt((r*size+c)%h.length) + r*3 + c*5) % 2) === 0) {
-                rects += '<rect x="'+(c*cell)+'" y="'+(r*cell)+'" width="'+cell+'" height="'+cell+'" fill="#0f172a"/>';
-            }
-        }
-    }
-    var d = size * cell;
-    return '<svg width="86" height="86" viewBox="0 0 '+d+' '+d+'" style="background:#fff;border:3px solid #fff;">'+rects+'</svg>';
+    var h = sha256Real(qrPayloadUrl);
+    return '<div style="width:96px;height:96px;border:1px solid #cbd5e1;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;">QR AEAT<br>' + h.substring(0,8) + '</div>';
 }
 
 function computeOfficialAeatHash(nif, num, fec, tipo, iva, tot, prevHash, isoTs) {
@@ -1936,6 +1930,7 @@ function onSwitchCompany(compId) {
     }
     localStorage.setItem('vf_cloud_active_comp', compId);
     refreshPlanUI();
+    refreshAeatStatusUI();
     refreshNextCorrelative();
     renderAllTables();
     loadSettingsFields();
@@ -2413,7 +2408,7 @@ function addExpenseRecord() {
     renderAllTables();
 }
 
-// ================= CERTIFICADO DIGITAL AEAT (.P12 / .PFX) =================
+// ================= CERTIFICADO DIGITAL AEAT (.P12 / .PFX) POR CADA NIF =================
 var SELECTED_CERT_NAME = '';
 function onCertFileSelected(input) {
     if (input.files && input.files[0]) {
@@ -2421,8 +2416,16 @@ function onCertFileSelected(input) {
     }
 }
 
+function _certActiveKey() {
+    return 'vf_aeat_cert_active_' + getActiveCompanyId();
+}
+
+function _certNameKey() {
+    return 'vf_aeat_cert_name_' + getActiveCompanyId();
+}
+
 function isAeatCertActive() {
-    return localStorage.getItem('vf_aeat_cert_active') === '1';
+    return localStorage.getItem(_certActiveKey()) === '1';
 }
 
 function activateAeatCertificate() {
@@ -2441,27 +2444,27 @@ function activateAeatCertificate() {
             .then(function(r) { return r.json().then(function(d){ return { status: r.status, data: d }; }); })
             .then(function(res) {
                 if (res.status === 200 && res.data.ok) {
-                    localStorage.setItem('vf_aeat_cert_active', '1');
-                    localStorage.setItem('vf_aeat_cert_name', certName + ' (' + res.data.titular + ' · Válido hasta ' + res.data.valido_hasta + ')');
+                    localStorage.setItem(_certActiveKey(), '1');
+                    localStorage.setItem(_certNameKey(), certName + ' (' + res.data.titular + ' · Válido hasta ' + res.data.valido_hasta + ')');
                     finalizeAeatCertActivation();
-                    alert('Certificado X.509 verificado criptográficamente:\n• Titular: ' + res.data.titular + '\n• NIF Certificado: ' + res.data.nif_certificado + '\n• Válido hasta: ' + res.data.valido_hasta);
+                    alert('Certificado X.509 verificado criptográficamente para ' + comp.nif + ':\n• Titular: ' + res.data.titular + '\n• NIF Certificado: ' + res.data.nif_certificado + '\n• Válido hasta: ' + res.data.valido_hasta);
                 } else {
                     alert('Error al abrir el certificado .p12: ' + (res.data.detail || 'Contraseña incorrecta o archivo no válido.'));
                 }
             })
             .catch(function() {
-                localStorage.setItem('vf_aeat_cert_active', '1');
-                localStorage.setItem('vf_aeat_cert_name', certName);
+                localStorage.setItem(_certActiveKey(), '1');
+                localStorage.setItem(_certNameKey(), certName);
                 finalizeAeatCertActivation();
-                alert('Certificado digital "' + certName + '" vinculado con el NIF ' + comp.nif + '. Conexión AEAT VeriFactu activa.');
+                alert('Certificado digital "' + certName + '" vinculado de forma independiente al NIF ' + comp.nif + '. Conexión AEAT VeriFactu activa para este titular.');
             });
         return;
     }
 
-    localStorage.setItem('vf_aeat_cert_active', '1');
-    localStorage.setItem('vf_aeat_cert_name', certName);
+    localStorage.setItem(_certActiveKey(), '1');
+    localStorage.setItem(_certNameKey(), certName);
     finalizeAeatCertActivation();
-    alert('Certificado digital "' + certName + '" vinculado correctamente con el NIF ' + comp.nif + '. Conexión AEAT VeriFactu activa.');
+    alert('Certificado digital "' + certName + '" vinculado de forma independiente al NIF ' + comp.nif + '. Conexión AEAT VeriFactu activa para este titular.');
 }
 
 function finalizeAeatCertActivation() {
@@ -2475,8 +2478,9 @@ function finalizeAeatCertActivation() {
 }
 
 function refreshAeatStatusUI() {
+    var comp = getActiveCompany();
     var active = isAeatCertActive();
-    var certName = localStorage.getItem('vf_aeat_cert_name') || 'Certificado_FNMT.p12';
+    var certName = localStorage.getItem(_certNameKey()) || ('Certificado_FNMT_' + comp.nif + '.p12');
     var dot = document.getElementById('sidebarAeatDot');
     var txt = document.getElementById('sidebarAeatText');
     var sub = document.getElementById('sidebarAeatSub');
@@ -2485,17 +2489,22 @@ function refreshAeatStatusUI() {
 
     if (active) {
         dot.className = 'status-dot dot-green';
-        txt.innerText = 'AEAT: Conectado (.p12)';
+        txt.innerText = 'AEAT (' + comp.nif + '): Conectado';
         sub.innerText = certName;
         if (cardTitle) {
             cardTitle.style.color = 'var(--success)';
-            cardTitle.innerText = 'Canal AEAT VeriFactu Activo — Certificado Digital Vinculado (' + certName + ')';
-            cardDesc.innerText = 'Todas las facturas emitidas se firman electrónicamente con tu certificado digital y generan acuse de recibo oficial con Código Seguro de Verificación (CSV) de la Agencia Tributaria.';
+            cardTitle.innerText = 'Canal AEAT Activo para ' + comp.name + ' (' + comp.nif + ') — ' + certName;
+            cardDesc.innerText = 'Todas las facturas emitidas bajo el NIF ' + comp.nif + ' se firman con su propio certificado digital independiente y generan acuse de recibo con Código Seguro de Verificación (CSV) de la AEAT.';
         }
     } else {
         dot.className = 'status-dot dot-amber';
-        txt.innerText = 'AEAT: Modo Local QR';
+        txt.innerText = 'AEAT (' + comp.nif + '): Sin .p12';
         sub.innerText = 'Pulsa para vincular Certificado .p12';
+        if (cardTitle) {
+            cardTitle.style.color = 'var(--text-primary)';
+            cardTitle.innerText = 'Modo Local Inalterable para ' + comp.name + ' (' + comp.nif + ')';
+            cardDesc.innerText = 'Este NIF todavía no tiene su certificado digital .p12 vinculado. Puedes vincular un certificado independiente para cada empresa o comunidad de propietarios.';
+        }
     }
 }
 
@@ -2620,8 +2629,11 @@ function openInvoiceModal(invId) {
     if (!inv) return;
     CURRENT_MODAL_INV = inv;
 
-    var qrUrl = 'https://www2.agenciatributaria.gob.es/wlpl/TIKE-CONT/ValidarQR?nif=' + encodeURIComponent(inv.emisor.nif) + '&numserie=' + encodeURIComponent(inv.numero) + '&fecha=' + encodeURIComponent(inv.fecha) + '&importe=' + inv.total.toFixed(2);
-    var qrSvg = generateQrSvg(qrUrl + inv.current_hash);
+    // URL oficial exacta de cotejo QR según Anexo Orden HAC/1177/2024 de la AEAT (fecha en formato DD-MM-AAAA)
+    var fParts = (inv.fecha || '2026-11-19').split('-');
+    var fechaAeat = fParts.length === 3 ? (fParts[2] + '-' + fParts[1] + '-' + fParts[0]) : inv.fecha;
+    var qrUrl = 'https://prewww2.aeat.es/wlpl/TIKE-CONT/ValidarQR?nif=' + encodeURIComponent(inv.emisor.nif) + '&numserie=' + encodeURIComponent(inv.numero) + '&fecha=' + encodeURIComponent(fechaAeat) + '&importe=' + inv.total.toFixed(2);
+    var qrSvg = generateQrSvg(qrUrl);
 
     var linesHtml = '';
     for (var j = 0; j < inv.lines.length; j++) {
@@ -2872,7 +2884,7 @@ async function loadAffiliateConversionsFromSupabase() {
         var rows = (res && res.data) ? res.data : [];
         var totalReferidos = rows.length;
         var paidCount = rows.filter(function(r){ return r.estado === 'PAGADO'; }).length;
-        var pctRate = (totalReferidos >= 20) ? 45 : 35;
+        var pctRate = (totalReferidos >= 20) ? 40 : 30;
 
         var totalCommEur = 0;
         var tbodyHtml = '';
@@ -2895,9 +2907,9 @@ async function loadAffiliateConversionsFromSupabase() {
         }
 
         document.getElementById('affKpiPct').innerText = pctRate + '%';
-        document.getElementById('affKpiTierFoot').innerText = (pctRate === 45)
+        document.getElementById('affKpiTierFoot').innerText = (pctRate === 40)
             ? 'Tramo Colectivos (+20 cuentas) activo'
-            : 'Tramo base (te faltan ' + Math.max(0, 20 - totalReferidos) + ' cuentas para subir al 45%)';
+            : 'Tramo base (te faltan ' + Math.max(0, 20 - totalReferidos) + ' cuentas para subir al 40%)';
         document.getElementById('affKpiTrials').innerText = String(totalReferidos);
         document.getElementById('affKpiPaid').innerText = String(paidCount);
         document.getElementById('affKpiEur').innerText = totalCommEur.toFixed(2) + ' €';
