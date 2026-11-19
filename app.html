@@ -1332,34 +1332,34 @@
 
                 <div class="kpi-grid">
                     <div class="kpi-card">
-                        <div class="kpi-label"><span>TRAMO DE COMISIÓN BASE</span></div>
-                        <div class="kpi-value" style="color:var(--brand);">35%</div>
-                        <div class="kpi-foot">Desde la primera cuenta referida</div>
+                        <div class="kpi-label"><span>TRAMO DE COMISIÓN ACTIVO</span></div>
+                        <div class="kpi-value" style="color:var(--brand);" id="affKpiPct">35%</div>
+                        <div class="kpi-foot" id="affKpiTierFoot">Tramo base (sube al 45% con +20 cuentas)</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label"><span>TRAMO COLECTIVOS (+20 CUENTAS)</span></div>
-                        <div class="kpi-value" style="color:var(--success);">45%</div>
-                        <div class="kpi-foot">Para grupos grandes y portales</div>
+                        <div class="kpi-label"><span>USUARIOS EN PRUEBA (15 DÍAS)</span></div>
+                        <div class="kpi-value" id="affKpiTrials">0</div>
+                        <div class="kpi-foot">Registrados desde tu enlace</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label"><span>PRUEBAS GRATIS (15 DÍAS)</span></div>
-                        <div class="kpi-value">18</div>
-                        <div class="kpi-foot">Usuarios probando desde tu enlace</div>
+                        <div class="kpi-label"><span>SUSCRIPCIONES ACTIVADAS</span></div>
+                        <div class="kpi-value" style="color:var(--success);" id="affKpiPaid">0</div>
+                        <div class="kpi-foot">Clientes con plan anual o mensual</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label"><span>COMISIONES ACUMULADAS</span></div>
-                        <div class="kpi-value" style="color:var(--success);">384,65 €</div>
+                        <div class="kpi-label"><span>COMISIONES GENERADAS</span></div>
+                        <div class="kpi-value" style="color:var(--success);" id="affKpiEur">0,00 €</div>
                         <div class="kpi-foot">Liquidación mensual por transferencia</div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h2 class="card-title">Generador de Enlace de Afiliado y Descuento para tu Comunidad</h2>
-                    <p class="card-sub">Comparte este enlace en tu artículo, newsletter o directorio. Cada lector disfruta de 15 días de prueba gratis + la oferta pre-1 de enero (39 €/año o 99 €/año Multi-NIF), y la venta queda asignada automáticamente a tu cuenta.</p>
+                    <h2 class="card-title">Tu Enlace Oficial de Partner / Comunidad</h2>
+                    <p class="card-sub">Comparte este enlace en tu artículo, newsletter o directorio. Cada lector disfruta de 15 días de prueba gratis + la oferta pre-1 de enero (39 €/año o 99 €/año Multi-NIF), y su registro queda vinculado automáticamente a tu código en la base de datos.</p>
                     <div class="grid-3" style="align-items:end;">
                         <div>
-                            <label>Código del Partner / Comunidad:</label>
-                            <input type="text" id="affCodeInput" value="presidente-comunidad" oninput="updateAffLink()">
+                            <label>Tu Código de Partner:</label>
+                            <input type="text" id="affCodeInput" value="presidente-comunidad" oninput="updateAffLink(); loadAffiliateConversionsFromSupabase();">
                         </div>
                         <div>
                             <label>Enlace de Seguimiento Directo (Cookie 90 días):</label>
@@ -1368,6 +1368,32 @@
                         <div>
                             <button type="button" class="btn btn-primary" onclick="copyAffLink()" style="width:100%;">Copiar Enlace de Partner</button>
                         </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div>
+                            <h2 class="card-title">Usuarios Referidos desde tu Enlace (Sincronizado en Vivo)</h2>
+                            <p class="card-sub" style="margin:0;">Listado en tiempo real de empresas y despachos que han creado cuenta a través de tu enlace de afiliado.</p>
+                        </div>
+                        <button type="button" class="btn btn-outline" onclick="loadAffiliateConversionsFromSupabase()">Actualizar Datos</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha Alta</th>
+                                    <th>Usuario / Empresa Referida</th>
+                                    <th>Estado</th>
+                                    <th>Plan Seleccionado</th>
+                                    <th>Tu Comisión (35% / 45%)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="affConversionsBody">
+                                <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Aún no hay registros con este código. Comparte tu enlace para ver aquí tus primeros referidos en directo.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -2799,10 +2825,31 @@ function saveCompanySettings() {
     setTimeout(function(){ msg.style.display = 'none'; }, 2500);
 }
 
-// ================= AFILIADOS =================
+// ================= AFILIADOS (SINCRONIZADO CON SUPABASE CLOUD) =================
+function initAffiliateCodeFromSession() {
+    var savedCode = localStorage.getItem('vf_my_affiliate_code');
+    try {
+        var rawSess = localStorage.getItem('vf_user_session');
+        if (rawSess) {
+            var sess = JSON.parse(rawSess);
+            if (sess.my_affiliate_code) savedCode = sess.my_affiliate_code;
+        }
+    } catch(e) {}
+    if (savedCode) {
+        var inp = document.getElementById('affCodeInput');
+        if (inp) inp.value = savedCode;
+    }
+    updateAffLink();
+    loadAffiliateConversionsFromSupabase();
+}
+
 function updateAffLink() {
     var c = document.getElementById('affCodeInput').value.trim() || 'partner';
-    document.getElementById('affLinkOutput').value = 'https://factura-verifactu.es/?ref=' + encodeURIComponent(c);
+    localStorage.setItem('vf_my_affiliate_code', c);
+    var baseOrigin = (window.location.origin && window.location.origin.indexOf('http') === 0)
+        ? window.location.origin
+        : 'https://factura-verifactu.es';
+    document.getElementById('affLinkOutput').value = baseOrigin + '/?ref=' + encodeURIComponent(c);
 }
 
 function copyAffLink() {
@@ -2810,6 +2857,58 @@ function copyAffLink() {
     el.select();
     document.execCommand('copy');
     alert('Enlace de partner copiado al portapapeles.');
+}
+
+async function loadAffiliateConversionsFromSupabase() {
+    if (!sbClient) return;
+    var code = (document.getElementById('affCodeInput').value || '').trim().toLowerCase();
+    if (!code) return;
+    try {
+        var res = await sbClient
+            .from('afiliados_conversiones')
+            .select('*')
+            .eq('codigo_afiliado', code)
+            .order('created_at', { ascending: false });
+        var rows = (res && res.data) ? res.data : [];
+        var totalReferidos = rows.length;
+        var paidCount = rows.filter(function(r){ return r.estado === 'PAGADO'; }).length;
+        var pctRate = (totalReferidos >= 20) ? 45 : 35;
+
+        var totalCommEur = 0;
+        var tbodyHtml = '';
+        for (var i = 0; i < rows.length; i++) {
+            var r = rows[i];
+            var subAmount = Number(r.importe_suscripcion || 39);
+            var comm = Number((subAmount * (pctRate / 100)).toFixed(2));
+            totalCommEur += comm;
+            var dateStr = (r.created_at || '').substring(0, 10);
+            var stBadge = (r.estado === 'PAGADO')
+                ? '<span class="badge badge-aeat-ok">Suscripción Pagada</span>'
+                : '<span class="badge badge-rect">En Prueba 15 Días</span>';
+            tbodyHtml += '<tr>' +
+                '<td>' + dateStr + '</td>' +
+                '<td><strong>' + (r.email_referido || 'Usuario registrado') + '</strong></td>' +
+                '<td>' + stBadge + '</td>' +
+                '<td>' + subAmount.toFixed(2) + ' €/año</td>' +
+                '<td style="color:var(--success); font-weight:700;">+' + comm.toFixed(2) + ' € (' + pctRate + '%)</td>' +
+            '</tr>';
+        }
+
+        document.getElementById('affKpiPct').innerText = pctRate + '%';
+        document.getElementById('affKpiTierFoot').innerText = (pctRate === 45)
+            ? 'Tramo Colectivos (+20 cuentas) activo'
+            : 'Tramo base (te faltan ' + Math.max(0, 20 - totalReferidos) + ' cuentas para subir al 45%)';
+        document.getElementById('affKpiTrials').innerText = String(totalReferidos);
+        document.getElementById('affKpiPaid').innerText = String(paidCount);
+        document.getElementById('affKpiEur').innerText = totalCommEur.toFixed(2) + ' €';
+
+        if (rows.length > 0) {
+            document.getElementById('affConversionsBody').innerHTML = tbodyHtml;
+        } else {
+            document.getElementById('affConversionsBody').innerHTML =
+                '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Aún no hay registros con el código <strong>' + code + '</strong>. Comparte tu enlace de arriba para registrar tus primeros referidos en tiempo real.</td></tr>';
+        }
+    } catch(e) {}
 }
 
 // Inicialización
@@ -2821,6 +2920,7 @@ refreshNextCorrelative();
 renderFormLines();
 renderQuoteLines();
 renderAllTables();
+initAffiliateCodeFromSession();
 pullCloudDataFromSupabase();
 if (localStorage.getItem('vf_open_aff') === '1') {
     localStorage.removeItem('vf_open_aff');
