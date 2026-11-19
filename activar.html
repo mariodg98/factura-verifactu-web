@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activación de Licencia FacturaE & VeriFactu Pro — KÓDEK Sistemas</title>
+    <style>
+        body { margin:0; background:#f1f5f9; color:#0f172a; font-family:'Segoe UI',system-ui,sans-serif; padding:2rem 1rem; line-height:1.55; }
+        .wrap { max-width:740px; margin:0 auto; }
+        .card { background:#ffffff; border:1px solid #cbd5e1; border-top:4px solid #0f172a; border-radius:14px; padding:2rem 2.2rem; box-shadow:0 10px 28px rgba(15,23,42,0.06); }
+        .badge { display:inline-block; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; padding:4px 12px; border-radius:99px; font-size:0.75rem; font-weight:800; margin-bottom:0.8rem; }
+        h1 { margin:0 0 0.5rem; font-size:1.5rem; color:#0f172a; }
+        .summary { background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:1.2rem; margin:1.2rem 0; }
+        .btn-pay { display:block; width:100%; box-sizing:border-box; text-align:center; background:#059669; color:#ffffff; text-decoration:none; padding:14px 20px; border-radius:9px; font-weight:800; font-size:1rem; border:none; cursor:pointer; margin-top:1rem; }
+        .btn-bank { display:block; width:100%; box-sizing:border-box; text-align:center; background:#ffffff; color:#0f172a; border:2px solid #0f172a; text-decoration:none; padding:12px 18px; border-radius:9px; font-weight:800; font-size:0.93rem; cursor:pointer; margin-top:0.75rem; }
+        .bank-box { display:none; background:#f8fafc; border:1px solid #94a3b8; border-radius:10px; padding:1.1rem; margin-top:0.85rem; font-size:0.88rem; }
+        .bank-box input { width:100%; box-sizing:border-box; padding:8px 10px; margin:4px 0 10px; border:1px solid #cbd5e1; border-radius:6px; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="card">
+        <span class="badge" id="expBadge">PASARELA DE ACTIVACIÓN OFICIAL • KÓDEK SISTEMAS</span>
+        <h1 id="planTitle">Activación Licencia FacturaE &amp; VeriFactu Pro (39 €)</h1>
+        <p style="margin:0; color:#475569; font-size:0.93rem;">
+            Pago único con tarjeta o Apple/Google Pay a través de Stripe. Una vez completado el abono, accederás automáticamente a la descarga de tu software completo sin cuotas mensuales.
+        </p>
+
+        <div class="summary">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.92rem;">
+                <span>Empresa / Titular de Licencia:</span>
+                <strong id="compName">Empresa Verificada</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.92rem;">
+                <span>Modalidad Seleccionada:</span>
+                <strong id="planDesc" style="color:#0284c7;">Licencia Perpetua PYME / Autónomo (.HTML + Desktop)</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-top:1px solid #cbd5e1; padding-top:8px; margin-top:8px; font-size:1.15rem; font-weight:900;">
+                <span>Importe Total (IVA incluido, pago único):</span>
+                <span id="planPrice" style="color:#059669;">39,00 €</span>
+            </div>
+        </div>
+
+        <a href="#" id="stripeBtn" class="btn-pay">💳 Opción 1: Pagar con Tarjeta / Apple Pay (Entrega Inmediata en Stripe) &rarr;</a>
+        <button type="button" class="btn-bank" onclick="document.getElementById('bankBox').style.display='block'">🏦 Opción 2: Solicitar Factura Oficial y Pagar por Transferencia Bancaria (IBAN)</button>
+
+        <div id="bankBox" class="bank-box">
+            <strong>📄 Solicitud de Factura Proforma + Número de Cuenta IBAN</strong>
+            <p style="margin:6px 0 10px; color:#475569;">Indica vuestra Razón Social y NIF/CIF. Te enviaremos en el día la factura oficial con el IBAN bancario y la licencia VeriFactu lista:</p>
+            <label>Razón Social / Nombre Fiscal y CIF:</label>
+            <input type="text" id="fiscalName" placeholder="Ej: Asesoría y Gestión S.L. - B12345678">
+            <label>Email de facturación:</label>
+            <input type="email" id="fiscalEmail" placeholder="administracion@tuempresa.es">
+            <button type="button" class="btn-pay" style="margin-top:4px; background:#0284c7;" onclick="sendBankRequestVF()">✉️ Recibir Factura Proforma y Datos IBAN por Email</button>
+        </div>
+
+        <div style="text-align:center; margin-top:1.2rem; font-size:0.82rem; color:#64748b;">
+            ¿Ya has completado el pago en la pestaña de Stripe? <a href="#" id="directDeliver" style="color:#0284c7; font-weight:700;">Acceder directamente a mi paquete de descarga &rarr;</a>
+        </div>
+    </div>
+</div>
+
+<script>
+var STRIPE_39 = "https://buy.stripe.com/7sY5kEaNZ6cZdSV4AS6oo0a";
+var STRIPE_99 = "https://buy.stripe.com/fZu5kE3lxdFr8yB1oG6oo0b";
+
+(function init() {
+    var params = new URLSearchParams(window.location.search);
+    var plan = params.get('plan') || '39';
+    var p = params.get('p') || '';
+    var d = {};
+    if (p) {
+        try {
+            var b64 = p.replace(/-/g, '+').replace(/_/g, '/');
+            while (b64.length % 4) b64 += '=';
+            d = JSON.parse(decodeURIComponent(escape(atob(b64))));
+        } catch(e) {}
+    }
+    if (d.n) document.getElementById('compName').innerText = d.n + (d.d ? ' (' + d.d + ')' : '');
+    if (d.exp) document.getElementById('expBadge').innerText = 'EXPEDIENTE ' + d.exp + ' • KÓDEK SISTEMAS';
+
+    if (plan === '99') {
+        document.getElementById('planTitle').innerText = 'Activación Plan Despacho Multi-NIF (Oferta 99 €/año)';
+        document.getElementById('planDesc').innerText = 'Suscripción Anual Multi-NIF (NIFs Ilimitados) · Oferta Pre-1 de Enero (después 149 €/año)';
+        document.getElementById('planPrice').innerText = '99,00 € / primer año';
+        document.getElementById('stripeBtn').href = STRIPE_99;
+    } else if (plan === 'mensual_autonomo') {
+        document.getElementById('planTitle').innerText = 'Activación Plan Autónomo Mensual (4,90 €/mes)';
+        document.getElementById('planDesc').innerText = 'Plan Individual 1 NIF · 4,90 €/mes los 3 primeros meses (después 7,90 €/mes, sin permanencia)';
+        document.getElementById('planPrice').innerText = '4,90 € / mes';
+        document.getElementById('stripeBtn').href = STRIPE_39;
+    } else if (plan === 'mensual_despacho') {
+        document.getElementById('planTitle').innerText = 'Activación Plan Despacho Multi-NIF Mensual (12,90 €/mes)';
+        document.getElementById('planDesc').innerText = 'Plan Multi-NIF Ilimitado · 12,90 €/mes los 3 primeros meses (después 19,90 €/mes, sin permanencia)';
+        document.getElementById('planPrice').innerText = '12,90 € / mes';
+        document.getElementById('stripeBtn').href = STRIPE_99;
+    } else {
+        document.getElementById('planTitle').innerText = 'Activación Plan Autónomo / PYME (Oferta 39 €/año)';
+        document.getElementById('planDesc').innerText = 'Suscripción Anual 1 NIF · Oferta Pre-1 de Enero (después 59 €/año)';
+        document.getElementById('planPrice').innerText = '39,00 € / primer año';
+        document.getElementById('stripeBtn').href = STRIPE_39;
+    }
+    document.getElementById('directDeliver').href = 'entrega-verifactu.html?plan=' + plan + (p ? '&p=' + p : '');
+    window._vfData = d;
+    window._vfPlan = plan;
+    if (d.em) document.getElementById('fiscalEmail').value = d.em;
+})();
+function sendBankRequestVF() {
+    var d = window._vfData || {};
+    var plan = window._vfPlan || '39';
+    var fiscal = document.getElementById('fiscalName').value || d.n || d.d || 'Empresa';
+    var email = document.getElementById('fiscalEmail').value || d.em || '';
+    var subj = encodeURIComponent('Solicitud Factura y Transferencia - VeriFactu Pro (' + (d.d || fiscal) + ')');
+    var body = encodeURIComponent('Hola equipo de KÓDEK Sistemas,\n\nSolicitamos factura oficial y número de cuenta IBAN para abonar por transferencia la Licencia FacturaE & VeriFactu Pro (' + plan + ' € IVA incl.).\n\n- Empresa / CIF: ' + fiscal + '\n- Dominio: ' + (d.d || '') + '\n- Expediente: ' + (d.exp || 'VF-2026') + '\n- Email de facturación: ' + email + '\n\nUn saludo.');
+    window.location.href = 'mailto:kodeksistemas@gmail.com?subject=' + subj + '&body=' + body;
+}
+</script>
+</body>
+</html>
