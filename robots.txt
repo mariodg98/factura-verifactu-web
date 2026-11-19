@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://factura-verifactu.es/sitemap.xml
