@@ -197,7 +197,7 @@
     <div class="auth-card">
         <div class="auth-tabs">
             <button type="button" class="auth-tab active" id="tabRegister" onclick="switchAuthTab('register')">Prueba 15 Días</button>
-            <button type="button" class="auth-tab" id="tabAffiliate" onclick="switchAuthTab('affiliate')">Alta Partner (35%)</button>
+            <button type="button" class="auth-tab" id="tabAffiliate" onclick="switchAuthTab('affiliate')">Alta Partner (30%)</button>
             <button type="button" class="auth-tab" id="tabLogin" onclick="switchAuthTab('login')">Iniciar Sesión</button>
         </div>
 
@@ -245,7 +245,7 @@
 
         <!-- FORMULARIO DE ALTA DE PARTNER / AFILIADO (100% GRATIS) -->
         <form id="affiliateForm" style="display:none;" onsubmit="handleAffiliateRegister(event)">
-            <h1>Programa Oficial de Partners (35% - 45%)</h1>
+            <h1>Programa Oficial de Partners (30% - 40%)</h1>
             <p class="sub">Crea tu cuenta gratuita de colaborador para obtener tu enlace de seguimiento y ver en tiempo real cuántos lectores se registran y tus comisiones acumuladas.</p>
 
             <div class="field">
@@ -277,7 +277,7 @@
             <button type="submit" class="btn-submit" style="background:var(--success);">Activar Cuenta Gratuita de Partner &rarr;</button>
 
             <div class="trial-note">
-                <strong>Condiciones garantizadas:</strong> Recibes el <strong>35% directo</strong> de cada suscripción (anual o mensual) activada desde tu enlace, y pasas automáticamente al <strong>45%</strong> al superar las 20 cuentas activas.Cuenta 100% gratuita para siempre.
+                <strong>Condiciones garantizadas:</strong> Recibes el <strong>30% directo</strong> de cada suscripción (anual o mensual) activada desde tu enlace, y pasas automáticamente al <strong>40%</strong> al superar las 20 cuentas activas. Cuenta 100% gratuita para siempre.
             </div>
         </form>
 
@@ -441,14 +441,14 @@ async function handleRegister(e) {
                 });
                 if (ref) {
                     var estPrice = (plan === 'multi') ? 99.00 : 39.00;
-                    var estComm = Number((estPrice * 0.35).toFixed(2));
+                    var estComm = Number((estPrice * 0.30).toFixed(2));
                     await supabaseClient.from('afiliados_conversiones').insert({
                         codigo_afiliado: ref,
                         usuario_referido_id: uid,
                         email_referido: email,
                         estado: 'TRIAL_15D',
                         importe_suscripcion: estPrice,
-                        porcentaje_comision: 35.00,
+                        porcentaje_comision: 30.00,
                         comision_eur: estComm
                     });
                 }
