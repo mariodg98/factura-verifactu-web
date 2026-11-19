@@ -75,8 +75,8 @@
         }
         .auth-tabs {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px;
             background: var(--bg);
             padding: 5px;
             border-radius: 8px;
@@ -84,13 +84,13 @@
             margin-bottom: 22px;
         }
         .auth-tab {
-            padding: 9px 12px;
+            padding: 8px 8px;
             border: none;
             border-radius: 6px;
             background: transparent;
             color: var(--muted);
             font-family: inherit;
-            font-size: 13.5px;
+            font-size: 12.5px;
             font-weight: 600;
             cursor: pointer;
         }
@@ -196,7 +196,8 @@
 <div class="auth-wrap">
     <div class="auth-card">
         <div class="auth-tabs">
-            <button type="button" class="auth-tab active" id="tabRegister" onclick="switchAuthTab('register')">Crear Cuenta (15 Días Gratis)</button>
+            <button type="button" class="auth-tab active" id="tabRegister" onclick="switchAuthTab('register')">Prueba 15 Días</button>
+            <button type="button" class="auth-tab" id="tabAffiliate" onclick="switchAuthTab('affiliate')">Alta Partner (35%)</button>
             <button type="button" class="auth-tab" id="tabLogin" onclick="switchAuthTab('login')">Iniciar Sesión</button>
         </div>
 
@@ -239,6 +240,44 @@
 
             <div class="trial-note">
                 <strong>Garantía de prueba sin compromiso:</strong> Disfrutarás de 15 días completos de acceso. Si contratas antes del 1 de Enero mantienes el precio reducido de lanzamiento (39 €/año en Plan 1 NIF o 99 €/año en Plan Multi-NIF).
+            </div>
+        </form>
+
+        <!-- FORMULARIO DE ALTA DE PARTNER / AFILIADO (100% GRATIS) -->
+        <form id="affiliateForm" style="display:none;" onsubmit="handleAffiliateRegister(event)">
+            <h1>Programa Oficial de Partners (35% - 45%)</h1>
+            <p class="sub">Crea tu cuenta gratuita de colaborador para obtener tu enlace de seguimiento y ver en tiempo real cuántos lectores se registran y tus comisiones acumuladas.</p>
+
+            <div class="field">
+                <label>Nombre del Portal, Comunidad o Despacho Colaborador:</label>
+                <input type="text" id="affName" required placeholder="Ej: Presidente de la Comunidad">
+            </div>
+
+            <div class="field">
+                <label>Código / Alias para tu Enlace de Recomendación (sin espacios):</label>
+                <input type="text" id="affCode" required placeholder="Ej: presidente-comunidad" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9\-]/g,'')">
+                <small style="font-size:11.5px; color:var(--brand); display:block; margin-top:4px;">Tu enlace será: <strong>https://factura-verifactu.es/?ref=<span id="affCodePreview">tu-codigo</span></strong></small>
+            </div>
+
+            <div class="field">
+                <label>Email del Partner (para acceso y avisos de comisión):</label>
+                <input type="email" id="affEmail" required placeholder="hola@tucomunidad.es">
+            </div>
+
+            <div class="field">
+                <label>Contraseña de Acceso al Panel:</label>
+                <input type="password" id="affPass" required minlength="6" placeholder="Mínimo 6 caracteres">
+            </div>
+
+            <div class="field">
+                <label>IBAN Bancario para liquidación mensual de comisiones (opcional ahora):</label>
+                <input type="text" id="affIban" placeholder="ES00 0000 0000 0000 0000 0000">
+            </div>
+
+            <button type="submit" class="btn-submit" style="background:var(--success);">Activar Cuenta Gratuita de Partner &rarr;</button>
+
+            <div class="trial-note">
+                <strong>Condiciones garantizadas:</strong> Recibes el <strong>35% directo</strong> de cada suscripción (anual o mensual) activada desde tu enlace, y pasas automáticamente al <strong>45%</strong> al superar las 20 cuentas activas.Cuenta 100% gratuita para siempre.
             </div>
         </form>
 
@@ -290,16 +329,72 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
     }
     if (params.get('mode') === 'login') {
         switchAuthTab('login');
+    } else if (params.get('mode') === 'affiliate') {
+        switchAuthTab('affiliate');
+    }
+    var affCodeInp = document.getElementById('affCode');
+    if (affCodeInp) {
+        affCodeInp.addEventListener('input', function() {
+            document.getElementById('affCodePreview').innerText = this.value || 'tu-codigo';
+        });
     }
 })();
 
 function switchAuthTab(mode) {
-    var isReg = (mode === 'register');
-    document.getElementById('registerForm').style.display = isReg ? 'block' : 'none';
-    document.getElementById('loginForm').style.display = isReg ? 'none' : 'block';
-    document.getElementById('tabRegister').className = 'auth-tab' + (isReg ? ' active' : '');
-    document.getElementById('tabLogin').className = 'auth-tab' + (!isReg ? ' active' : '');
+    document.getElementById('registerForm').style.display = (mode === 'register') ? 'block' : 'none';
+    document.getElementById('affiliateForm').style.display = (mode === 'affiliate') ? 'block' : 'none';
+    document.getElementById('loginForm').style.display = (mode === 'login') ? 'block' : 'none';
+    document.getElementById('tabRegister').className = 'auth-tab' + (mode === 'register' ? ' active' : '');
+    document.getElementById('tabAffiliate').className = 'auth-tab' + (mode === 'affiliate' ? ' active' : '');
+    document.getElementById('tabLogin').className = 'auth-tab' + (mode === 'login' ? ' active' : '');
     document.getElementById('authErrorBox').style.display = 'none';
+}
+
+async function handleAffiliateRegister(e) {
+    e.preventDefault();
+    var name = document.getElementById('affName').value.trim();
+    var code = document.getElementById('affCode').value.trim().toLowerCase().replace(/[^a-z0-9\-]/g, '') || 'partner';
+    var email = document.getElementById('affEmail').value.trim().toLowerCase();
+    var pass = document.getElementById('affPass').value;
+    var iban = document.getElementById('affIban').value.trim();
+
+    var now = new Date();
+    var userSession = {
+        role: 'affiliate',
+        email: email,
+        name: name,
+        my_affiliate_code: code,
+        iban: iban,
+        plan: 'single',
+        logged_at: now.toISOString()
+    };
+
+    if (supabaseClient) {
+        try {
+            var signRes = await supabaseClient.auth.signUp({
+                email: email,
+                password: pass,
+                options: { data: { nombre_titular: name, mi_codigo_afiliado: code, rol: 'affiliate' } }
+            });
+            var uid = (signRes.data && signRes.data.user) ? signRes.data.user.id : null;
+            if (uid) {
+                userSession.user_id = uid;
+                await supabaseClient.from('perfiles_cuenta').upsert({
+                    id: uid,
+                    email: email,
+                    nombre_titular: name,
+                    plan_tipo: 'single',
+                    estado_suscripcion: 'trial_15d',
+                    mi_codigo_afiliado: code
+                });
+            }
+        } catch(err) {}
+    }
+
+    localStorage.setItem('vf_user_session', JSON.stringify(userSession));
+    localStorage.setItem('vf_my_affiliate_code', code);
+    localStorage.setItem('vf_open_aff', '1');
+    window.location.href = 'app.html';
 }
 
 async function handleRegister(e) {
@@ -344,6 +439,19 @@ async function handleRegister(e) {
                     estado_suscripcion: 'trial_15d',
                     codigo_afiliado_origen: ref
                 });
+                if (ref) {
+                    var estPrice = (plan === 'multi') ? 99.00 : 39.00;
+                    var estComm = Number((estPrice * 0.35).toFixed(2));
+                    await supabaseClient.from('afiliados_conversiones').insert({
+                        codigo_afiliado: ref,
+                        usuario_referido_id: uid,
+                        email_referido: email,
+                        estado: 'TRIAL_15D',
+                        importe_suscripcion: estPrice,
+                        porcentaje_comision: 35.00,
+                        comision_eur: estComm
+                    });
+                }
                 var empIns = await supabaseClient.from('empresas_emisoras').insert({
                     user_id: uid,
                     razon_social: name,
