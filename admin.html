@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Maestro de Administración y Liquidación de Partners — Factura-VeriFactu.es</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --text: #0f172a;
+            --secondary: #475569;
+            --muted: #64748b;
+            --brand: #1e40af;
+            --brand-hover: #1e3a8a;
+            --brand-soft: #eff6ff;
+            --success: #15803d;
+            --success-soft: #f0fdf4;
+            --success-border: #bbf7d0;
+            --warning: #b45309;
+            --warning-soft: #fffbeb;
+            --warning-border: #fde68a;
+            --danger: #b91c1c;
+            --danger-soft: #fef2f2;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        header {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .wrap {
+            max-width: 1120px;
+            margin: 26px auto;
+            padding: 0 18px 50px;
+        }
+        .login-gate {
+            max-width: 430px;
+            margin: 70px auto;
+            background: var(--surface);
+            border: 1px solid var(--border-strong);
+            border-radius: 10px;
+            padding: 28px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+        }
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 9px 11px;
+            border: 1px solid var(--border-strong);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13.5px;
+            margin-bottom: 14px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px 15px;
+            border-radius: 7px;
+            border: 1px solid transparent;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--brand); color: #ffffff; }
+        .btn-primary:hover { background: var(--brand-hover); }
+        .btn-success { background: var(--success); color: #ffffff; }
+        .btn-outline { background: #ffffff; color: var(--text); border-color: var(--border-strong); }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 820px) { .kpi-grid { grid-template-columns: 1fr 1fr; } }
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 16px 18px;
+        }
+        .kpi-label {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .kpi-value {
+            font-size: 22px;
+            font-weight: 800;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+        }
+        .card-title { margin: 0 0 4px; font-size: 16px; font-weight: 700; }
+        .card-sub { margin: 0 0 16px; font-size: 13px; color: var(--muted); }
+        .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f8fafc; color: var(--muted); font-size: 11.5px; text-transform: uppercase; font-weight: 600; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 5px; font-size: 11.5px; font-weight: 600; }
+        .badge-ok { background: var(--success-soft); color: var(--success); border: 1px solid var(--success-border); }
+        .badge-trial { background: var(--warning-soft); color: var(--warning); border: 1px solid var(--warning-border); }
+        .privacy-strip {
+            background: var(--success-soft);
+            border: 1px solid var(--success-border);
+            color: #14532d;
+            border-radius: 8px;
+            padding: 11px 15px;
+            font-size: 12.5px;
+            margin-bottom: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <strong style="font-size:15px;">Factura-VeriFactu.es — Panel Maestro de Administración</strong>
+        <span style="display:block; font-size:11.5px; color:#94a3b8;">Uso exclusivo del titular · Liquidación de Afiliados (Sin acceso a facturas privadas de clientes)</span>
+    </div>
+    <div id="adminHeaderActions" style="display:none; gap:10px; align-items:center;">
+        <span id="adminEmailDisplay" style="font-size:12.5px; color:#cbd5e1;"></span>
+        <button type="button" class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="loadAdminData()">Actualizar</button>
+        <button type="button" class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="logoutAdmin()">Salir</button>
+    </div>
+</header>
+
+<!-- PUERTA DE ACCESO EXCLUSIVA DEL ADMINISTRADOR -->
+<div id="adminLoginGate" class="login-gate">
+    <h1 style="margin:0 0 6px; font-size:19px; font-weight:800;">Acceso Exclusivo Administrador</h1>
+    <p style="margin:0 0 18px; font-size:13px; color:var(--muted);">
+        Inicia sesión con tu cuenta maestra de administrador (<strong>kodeksistemas@gmail.com</strong>) para consultar y liquidar las comisiones de tus afiliados.
+    </p>
+    <div id="adminErr" style="display:none; background:var(--danger-soft); color:var(--danger); padding:9px 12px; border-radius:6px; font-size:12.5px; margin-bottom:12px;"></div>
+    <form onsubmit="handleAdminLogin(event)">
+        <label>Email de Administrador:</label>
+        <input type="email" id="admEmail" required value="kodeksistemas@gmail.com">
+        <label>Contraseña de tu cuenta en Supabase:</label>
+        <input type="password" id="admPass" required placeholder="Tu contraseña">
+        <button type="submit" class="btn btn-primary" style="width:100%;">Entrar al Panel Maestro</button>
+    </form>
+</div>
+
+<!-- CONTENIDO DEL PANEL MAESTRO -->
+<div id="adminMainPanel" class="wrap" style="display:none;">
+    <div class="privacy-strip">
+        <strong>Garantía RGPD Activa:</strong> Este panel de administración consulta exclusivamente la tabla de liquidación de afiliados (<code>afiliados_conversiones</code>). Nunca lee ni muestra facturas, gastos, clientes ni certificados digitales de los usuarios.
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Afiliados Activos</div>
+            <div class="kpi-value" id="admKpiPartners">0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Total Referidos (Pruebas)</div>
+            <div class="kpi-value" id="admKpiTrials">0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Suscripciones Pagadas</div>
+            <div class="kpi-value" style="color:var(--brand);" id="admKpiPaid">0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Total Comisiones a Pagar</div>
+            <div class="kpi-value" style="color:var(--success);" id="admKpiTotalPay">0,00 €</div>
+        </div>
+    </div>
+
+    <!-- TABLA 1: RESUMEN AGRUPADO POR AFILIADO (CUÁNTO PAGAR A CADA UNO) -->
+    <div class="card">
+        <h2 class="card-title">1. Liquidación Agrupada por Afiliado (Cuánto transferir a cada Partner)</h2>
+        <p class="card-sub">Aplica automáticamente el 30% base y sube al 40% cuando un afiliado alcanza 20 o más suscripciones pagadas.</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código de Afiliado</th>
+                        <th>Pruebas 15d</th>
+                        <th>Cuentas Pagadas</th>
+                        <th>Tramo Aplicado</th>
+                        <th>Facturación Generada</th>
+                        <th>Comisión a Transferir</th>
+                    </tr>
+                </thead>
+                <tbody id="admSummaryBody">
+                    <tr><td colspan="6" style="text-align:center; color:var(--muted);">Cargando resumen de afiliados...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TABLA 2: DETALLE DE CADA REFERIDO CON BOTÓN DE MARCAR COMO PAGADO -->
+    <div class="card">
+        <h2 class="card-title">2. Detalle de Registros Referidos (Control de Pagos)</h2>
+        <p class="card-sub">Si un cliente referido te paga por transferencia bancaria (fuera de Stripe), puedes pulsar "Marcar como Pagado" para que se sume automáticamente a la comisión del afiliado.</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Afiliado</th>
+                        <th>Email Cliente Referido</th>
+                        <th>Plan (€)</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="admDetailBody">
+                    <tr><td colspan="6" style="text-align:center; color:var(--muted);">Cargando detalle...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+var ADMIN_ALLOWED_EMAILS = ['kodeksistemas@gmail.com'];
+var SUPABASE_URL = 'https://tbxjgigjmakgpogotgjr.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_NCGpWz9PyR5JfsYrSaQx8Q_PO5H2Swz';
+var sbClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+async function handleAdminLogin(e) {
+    e.preventDefault();
+    var email = document.getElementById('admEmail').value.trim().toLowerCase();
+    var pass = document.getElementById('admPass').value;
+    var err = document.getElementById('adminErr');
+    err.style.display = 'none';
+
+    if (ADMIN_ALLOWED_EMAILS.indexOf(email) === -1) {
+        err.style.display = 'block';
+        err.innerText = 'Acceso denegado: este correo no tiene permisos de Administrador Maestro.';
+        return;
+    }
+
+    if (sbClient) {
+        var res = await sbClient.auth.signInWithPassword({ email: email, password: pass });
+        if (res.error) {
+            err.style.display = 'block';
+            err.innerText = 'Error de acceso: ' + res.error.message + ' (Si aún no has creado tu cuenta kodeksistemas@gmail.com en Factura-VeriFactu.es, regístrala primero en login.html).';
+            return;
+        }
+    }
+
+    localStorage.setItem('vf_admin_auth', email);
+    showAdminPanel(email);
+}
+
+function showAdminPanel(email) {
+    document.getElementById('adminLoginGate').style.display = 'none';
+    document.getElementById('adminMainPanel').style.display = 'block';
+    document.getElementById('adminHeaderActions').style.display = 'flex';
+    document.getElementById('adminEmailDisplay').innerText = email;
+    loadAdminData();
+}
+
+async function loadAdminData() {
+    if (!sbClient) return;
+    var res = await sbClient
+        .from('afiliados_conversiones')
+        .select('*')
+        .order('created_at', { ascending: false });
+    var rows = (res && res.data) ? res.data : [];
+
+    var byAff = {};
+    var totalTrials = 0;
+    var totalPaid = 0;
+    var totalCommAll = 0;
+    var detailHtml = '';
+
+    for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        var code = r.codigo_afiliado || 'sin-codigo';
+        if (!byAff[code]) byAff[code] = { trials: 0, paid: 0, revenue: 0 };
+        if (r.estado === 'PAGADO') {
+            byAff[code].paid += 1;
+            byAff[code].revenue += Number(r.importe_suscripcion || 39);
+            totalPaid += 1;
+        } else {
+            byAff[code].trials += 1;
+            totalTrials += 1;
+        }
+
+        var badge = r.estado === 'PAGADO'
+            ? '<span class="badge badge-ok">PAGADO</span>'
+            : '<span class="badge badge-trial">PRUEBA 15 DÍAS</span>';
+        var actionBtn = r.estado === 'PAGADO'
+            ? '<span style="font-size:12px; color:var(--muted);">Contabilizado</span>'
+            : '<button type="button" class="btn btn-success" style="padding:5px 10px; font-size:11.5px;" onclick="markReferralPaid(\'' + r.id + '\', ' + Number(r.importe_suscripcion || 39) + ')">Marcar como Pagado</button>';
+
+        detailHtml += '<tr>' +
+            '<td>' + (r.created_at || '').substring(0, 10) + '</td>' +
+            '<td><strong>' + code + '</strong></td>' +
+            '<td>' + (r.email_referido || '-') + '</td>' +
+            '<td>' + Number(r.importe_suscripcion || 39).toFixed(2) + ' €</td>' +
+            '<td>' + badge + '</td>' +
+            '<td>' + actionBtn + '</td>' +
+        '</tr>';
+    }
+
+    var summaryHtml = '';
+    var partnerKeys = Object.keys(byAff);
+    for (var j = 0; j < partnerKeys.length; j++) {
+        var k = partnerKeys[j];
+        var st = byAff[k];
+        var pct = (st.paid >= 20) ? 40 : 30;
+        var comm = Number((st.revenue * (pct / 100)).toFixed(2));
+        totalCommAll += comm;
+        summaryHtml += '<tr>' +
+            '<td><strong>' + k + '</strong></td>' +
+            '<td>' + st.trials + '</td>' +
+            '<td><strong>' + st.paid + '</strong></td>' +
+            '<td>' + pct + '%</td>' +
+            '<td>' + st.revenue.toFixed(2) + ' €</td>' +
+            '<td style="color:var(--success); font-weight:800; font-size:14px;">' + comm.toFixed(2) + ' €</td>' +
+        '</tr>';
+    }
+
+    document.getElementById('admKpiPartners').innerText = String(partnerKeys.length);
+    document.getElementById('admKpiTrials').innerText = String(totalTrials);
+    document.getElementById('admKpiPaid').innerText = String(totalPaid);
+    document.getElementById('admKpiTotalPay').innerText = totalCommAll.toFixed(2) + ' €';
+
+    document.getElementById('admSummaryBody').innerHTML = summaryHtml || '<tr><td colspan="6" style="text-align:center; color:var(--muted);">Todavía no hay registros de afiliados.</td></tr>';
+    document.getElementById('admDetailBody').innerHTML = detailHtml || '<tr><td colspan="6" style="text-align:center; color:var(--muted);">Todavía no hay registros.</td></tr>';
+}
+
+async function markReferralPaid(rowId, amount) {
+    if (!sbClient) return;
+    if (!confirm('¿Confirmas que este cliente ha pagado su suscripción de ' + amount + ' € para sumar la comisión al afiliado?')) return;
+    await sbClient.from('afiliados_conversiones').update({
+        estado: 'PAGADO',
+        comision_eur: Number((amount * 0.30).toFixed(2))
+    }).eq('id', rowId);
+    loadAdminData();
+}
+
+async function logoutAdmin() {
+    localStorage.removeItem('vf_admin_auth');
+    if (sbClient) { try { await sbClient.auth.signOut(); } catch(e) {} }
+    window.location.reload();
+}
+
+(async function checkAdminSession() {
+    if (sbClient) {
+        var s = await sbClient.auth.getSession();
+        var u = (s.data && s.data.session) ? s.data.session.user : null;
+        if (u && ADMIN_ALLOWED_EMAILS.indexOf((u.email || '').toLowerCase()) !== -1) {
+            showAdminPanel(u.email.toLowerCase());
+        }
+    }
+})();
+</script>
+</body>
+</html>
