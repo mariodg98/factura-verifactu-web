@@ -2459,7 +2459,7 @@ function activateAeatCertificate() {
         var fd = new FormData();
         fd.append('cert_file', fileInput.files[0]);
         fd.append('password', pass || '');
-        var apiBase = localStorage.getItem('vf_aeat_api_url') || 'http://127.0.0.1:8090';
+        var apiBase = localStorage.getItem('vf_aeat_api_url') || '';
         fetch(apiBase + '/api/aeat/verificar-certificado', { method: 'POST', body: fd })
             .then(function(r) { return r.json().then(function(d){ return { status: r.status, data: d }; }); })
             .then(function(res) {
