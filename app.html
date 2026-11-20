@@ -1571,16 +1571,21 @@
             window.location.replace('afiliados.html');
             return;
         }
-        // Si vuelve de Stripe con ?paid=ok, activamos su suscripción
+        // Si vuelve de Stripe con ?paid=ok, activamos su suscripción y la marcamos pagada en Supabase
         var params = new URLSearchParams(window.location.search);
         if (params.get('paid') === 'ok') {
-            sess.sub_status = 'active_annual';
-            var pType = params.get('plan');
-            if (pType === 'multi' || pType === '99' || pType === 'mensual_despacho') {
-                sess.plan = 'multi';
-                localStorage.setItem('vf_cloud_plan_type', 'multi');
-            }
+            var pType = params.get('plan') || '39';
+            var isMonthly = (pType === 'mensual_autonomo' || pType === 'mensual_despacho');
+            var isMulti = (pType === 'multi' || pType === '99' || pType === 'mensual_despacho');
+            sess.sub_status = isMonthly ? 'active_monthly' : 'active_annual';
+            sess.plan = isMulti ? 'multi' : 'single';
+            localStorage.setItem('vf_cloud_plan_type', sess.plan);
             localStorage.setItem('vf_user_session', JSON.stringify(sess));
+            localStorage.setItem('vf_pending_paid_sync', JSON.stringify({
+                plan_tipo: sess.plan,
+                estado_suscripcion: sess.sub_status,
+                importe: pType === '99' ? 99 : (pType === 'mensual_despacho' ? 12.90 : (pType === 'mensual_autonomo' ? 4.90 : 39))
+            }));
         }
     } catch(e) {
         window.location.replace('login.html?mode=login');
@@ -1657,6 +1662,23 @@ async function pullCloudDataFromSupabase() {
         var sessRes = await sbClient.auth.getSession();
         var user = (sessRes.data && sessRes.data.session) ? sessRes.data.session.user : null;
         if (!user) return;
+        // Si acaba de volver de Stripe (?paid=ok), actualiza su perfil y la comisión del afiliado en Supabase
+        var pendingPaidRaw = localStorage.getItem('vf_pending_paid_sync');
+        if (pendingPaidRaw) {
+            try {
+                var pData = JSON.parse(pendingPaidRaw);
+                await sbClient.from('perfiles_cuenta').update({
+                    plan_tipo: pData.plan_tipo,
+                    estado_suscripcion: pData.estado_suscripcion
+                }).eq('id', user.id);
+                await sbClient.from('afiliados_conversiones').update({
+                    estado: 'PAGADO',
+                    importe_suscripcion: pData.importe,
+                    comision_eur: Number((pData.importe * 0.30).toFixed(2))
+                }).eq('usuario_referido_id', user.id);
+                localStorage.removeItem('vf_pending_paid_sync');
+            } catch(pe) {}
+        }
         var profRes = await sbClient.from('perfiles_cuenta').select('*').eq('id', user.id).single();
         if (profRes.data && profRes.data.plan_tipo) {
             localStorage.setItem('vf_cloud_plan_type', profRes.data.plan_tipo);
