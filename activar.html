@@ -3,117 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Activación de Licencia FacturaE & VeriFactu Pro — KÓDEK Sistemas</title>
+    <title>Activar Suscripción — Factura-VeriFactu.es</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { margin:0; background:#f1f5f9; color:#0f172a; font-family:'Segoe UI',system-ui,sans-serif; padding:2rem 1rem; line-height:1.55; }
-        .wrap { max-width:740px; margin:0 auto; }
-        .card { background:#ffffff; border:1px solid #cbd5e1; border-top:4px solid #0f172a; border-radius:14px; padding:2rem 2.2rem; box-shadow:0 10px 28px rgba(15,23,42,0.06); }
-        .badge { display:inline-block; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; padding:4px 12px; border-radius:99px; font-size:0.75rem; font-weight:800; margin-bottom:0.8rem; }
-        h1 { margin:0 0 0.5rem; font-size:1.5rem; color:#0f172a; }
-        .summary { background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:1.2rem; margin:1.2rem 0; }
-        .btn-pay { display:block; width:100%; box-sizing:border-box; text-align:center; background:#059669; color:#ffffff; text-decoration:none; padding:14px 20px; border-radius:9px; font-weight:800; font-size:1rem; border:none; cursor:pointer; margin-top:1rem; }
-        .btn-bank { display:block; width:100%; box-sizing:border-box; text-align:center; background:#ffffff; color:#0f172a; border:2px solid #0f172a; text-decoration:none; padding:12px 18px; border-radius:9px; font-weight:800; font-size:0.93rem; cursor:pointer; margin-top:0.75rem; }
-        .bank-box { display:none; background:#f8fafc; border:1px solid #94a3b8; border-radius:10px; padding:1.1rem; margin-top:0.85rem; font-size:0.88rem; }
-        .bank-box input { width:100%; box-sizing:border-box; padding:8px 10px; margin:4px 0 10px; border:1px solid #cbd5e1; border-radius:6px; }
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --text: #0f172a;
+            --secondary: #475569;
+            --muted: #64748b;
+            --brand: #1e40af;
+            --brand-hover: #1e3a8a;
+            --brand-soft: #eff6ff;
+            --success: #15803d;
+            --success-soft: #f0fdf4;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.55;
+            font-size: 14.5px;
+        }
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            background: var(--brand);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wrap {
+            max-width: 680px;
+            margin: 34px auto;
+            padding: 0 16px 48px;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border-strong);
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+        }
+        .plan-switcher {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 560px) { .plan-switcher { grid-template-columns: 1fr; } }
+        .ps-btn {
+            padding: 10px 12px;
+            border: 1px solid var(--border-strong);
+            border-radius: 7px;
+            background: var(--bg);
+            color: var(--secondary);
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+        }
+        .ps-btn.active {
+            background: var(--brand-soft);
+            border-color: var(--brand);
+            color: var(--brand);
+        }
+        h1 {
+            margin: 0 0 6px;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+        }
+        .summary {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 18px 0;
+        }
+        .sum-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: 13.5px;
+        }
+        .sum-total {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--border-strong);
+            padding-top: 10px;
+            margin-top: 10px;
+            font-size: 17px;
+            font-weight: 800;
+        }
+        .btn-pay {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: var(--brand);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 13px 20px;
+            border-radius: 7px;
+            font-weight: 700;
+            font-size: 14.5px;
+            border: none;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .btn-pay:hover { background: var(--brand-hover); }
+        .btn-bank {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: #ffffff;
+            color: var(--text);
+            border: 1px solid var(--border-strong);
+            text-decoration: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            font-weight: 600;
+            font-size: 13.5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-bank:hover { background: var(--bg); }
+        .bank-box {
+            display: none;
+            background: var(--bg);
+            border: 1px solid var(--border-strong);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 14px;
+            font-size: 13px;
+        }
+        .bank-box label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 8px 0 4px;
+            color: var(--secondary);
+        }
+        .bank-box input {
+            width: 100%;
+            padding: 9px 11px;
+            border: 1px solid var(--border-strong);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13.5px;
+        }
+        .notice-stripe {
+            display: none;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
+
+<header>
+    <a href="index.html" class="brand">
+        <div class="brand-icon">VF</div>
+        <div>
+            <strong style="font-size:15px;">Factura-VeriFactu.es</strong>
+            <span style="display:block; font-size:11.5px; color:var(--muted);">Activación de Suscripción Cloud AEAT</span>
+        </div>
+    </a>
+    <a href="index.html" style="font-size:13px; color:var(--brand); text-decoration:none; font-weight:600;">&larr; Volver a la web</a>
+</header>
+
 <div class="wrap">
     <div class="card">
-        <span class="badge" id="expBadge">PASARELA DE ACTIVACIÓN OFICIAL • KÓDEK SISTEMAS</span>
-        <h1 id="planTitle">Activación Licencia FacturaE &amp; VeriFactu Pro (39 €)</h1>
-        <p style="margin:0; color:#475569; font-size:0.93rem;">
-            Pago único con tarjeta o Apple/Google Pay a través de Stripe. Una vez completado el abono, accederás automáticamente a la descarga de tu software completo sin cuotas mensuales.
+        <h1 id="planTitle">Activar Suscripción — Plan Autónomo / PYME</h1>
+        <p style="margin:0 0 16px; color:var(--muted); font-size:13.5px;">
+            Selecciona la modalidad que prefieras. Tras completar el pago seguro con Stripe (o por transferencia bancaria con factura oficial deducible), tu cuenta en <strong>Factura-VeriFactu.es</strong> quedará activa al instante en ordenador y móvil.
         </p>
 
+        <!-- Selector rápido de los 4 planes -->
+        <div class="plan-switcher">
+            <button type="button" class="ps-btn" id="ps_39" onclick="selectPlan('39')">Anual Autónomo (1 NIF) — 39 €/año</button>
+            <button type="button" class="ps-btn" id="ps_99" onclick="selectPlan('99')">Anual Despacho (Multi-NIF) — 99 €/año</button>
+            <button type="button" class="ps-btn" id="ps_mensual_autonomo" onclick="selectPlan('mensual_autonomo')">Mensual Autónomo (1 NIF) — 4,90 €/mes</button>
+            <button type="button" class="ps-btn" id="ps_mensual_despacho" onclick="selectPlan('mensual_despacho')">Mensual Despacho (Multi-NIF) — 12,90 €/mes</button>
+        </div>
+
         <div class="summary">
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.92rem;">
-                <span>Empresa / Titular de Licencia:</span>
-                <strong id="compName">Empresa Verificada</strong>
+            <div class="sum-row">
+                <span style="color:var(--muted);">Cuenta / Titular:</span>
+                <strong id="compName">Tu cuenta en Factura-VeriFactu.es</strong>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.92rem;">
-                <span>Modalidad Seleccionada:</span>
-                <strong id="planDesc" style="color:#0284c7;">Licencia Perpetua PYME / Autónomo (.HTML + Desktop)</strong>
+            <div class="sum-row">
+                <span style="color:var(--muted);">Modalidad seleccionada:</span>
+                <strong id="planDesc" style="color:var(--brand);">Plan Autónomo 1 NIF · Oferta Anual Pre-1 de Enero</strong>
             </div>
-            <div style="display:flex; justify-content:space-between; border-top:1px solid #cbd5e1; padding-top:8px; margin-top:8px; font-size:1.15rem; font-weight:900;">
-                <span>Importe Total (IVA incluido, pago único):</span>
-                <span id="planPrice" style="color:#059669;">39,00 €</span>
+            <div class="sum-row">
+                <span style="color:var(--muted);">Renovación tras periodo promocional:</span>
+                <span id="planRenew">59 €/año (cancelable en cualquier momento)</span>
+            </div>
+            <div class="sum-total">
+                <span>Importe a abonar hoy (IVA incluido):</span>
+                <span id="planPrice" style="color:var(--success);">39,00 €</span>
             </div>
         </div>
 
-        <a href="#" id="stripeBtn" class="btn-pay">💳 Opción 1: Pagar con Tarjeta / Apple Pay (Entrega Inmediata en Stripe) &rarr;</a>
-        <button type="button" class="btn-bank" onclick="document.getElementById('bankBox').style.display='block'">🏦 Opción 2: Solicitar Factura Oficial y Pagar por Transferencia Bancaria (IBAN)</button>
+        <a href="#" id="stripeBtn" class="btn-pay" onclick="return onStripePayClick(event)">Pagar con Tarjeta / Apple Pay / Google Pay (Stripe Seguro) &rarr;</a>
+        <div id="stripeConfigNotice" class="notice-stripe"></div>
+
+        <button type="button" class="btn-bank" onclick="document.getElementById('bankBox').style.display='block'">Solicitar Factura Oficial y Pagar por Transferencia Bancaria (IBAN)</button>
 
         <div id="bankBox" class="bank-box">
-            <strong>📄 Solicitud de Factura Proforma + Número de Cuenta IBAN</strong>
-            <p style="margin:6px 0 10px; color:#475569;">Indica vuestra Razón Social y NIF/CIF. Te enviaremos en el día la factura oficial con el IBAN bancario y la licencia VeriFactu lista:</p>
-            <label>Razón Social / Nombre Fiscal y CIF:</label>
-            <input type="text" id="fiscalName" placeholder="Ej: Asesoría y Gestión S.L. - B12345678">
-            <label>Email de facturación:</label>
-            <input type="email" id="fiscalEmail" placeholder="administracion@tuempresa.es">
-            <button type="button" class="btn-pay" style="margin-top:4px; background:#0284c7;" onclick="sendBankRequestVF()">✉️ Recibir Factura Proforma y Datos IBAN por Email</button>
-        </div>
-
-        <div style="text-align:center; margin-top:1.2rem; font-size:0.82rem; color:#64748b;">
-            ¿Ya has completado el pago en la pestaña de Stripe? <a href="#" id="directDeliver" style="color:#0284c7; font-weight:700;">Acceder directamente a mi paquete de descarga &rarr;</a>
+            <strong>Solicitud de Factura Proforma + Cuenta Bancaria IBAN</strong>
+            <p style="margin:4px 0 10px; color:var(--muted);">Indica tu Razón Social y NIF/CIF. Te enviaremos la factura oficial con IVA deducible y el número de cuenta para activar tu suscripción:</p>
+            <label>Razón Social / Nombre Fiscal y NIF/CIF:</label>
+            <input type="text" id="fiscalName" placeholder="Ej: Martínez Administración S.L. - B84521904">
+            <label>Email de tu cuenta en Factura-VeriFactu.es:</label>
+            <input type="email" id="fiscalEmail" placeholder="tu@empresa.es">
+            <button type="button" class="btn-pay" style="margin-top:12px;" onclick="sendBankRequest()">Enviar Solicitud de Factura y Transferencia</button>
         </div>
     </div>
 </div>
 
 <script>
-var STRIPE_39 = "https://buy.stripe.com/7sY5kEaNZ6cZdSV4AS6oo0a";
-var STRIPE_99 = "https://buy.stripe.com/fZu5kE3lxdFr8yB1oG6oo0b";
+// ENLACES DE SUSCRIPCIÓN DE STRIPE PARA FACTURA-VERIFACTU.ES
+// (Se rellenan con los 4 Payment Links nuevos que apuntan de vuelta a https://factura-verifactu.es/app.html?paid=ok)
+var STRIPE_LINKS = {
+    '39': '',
+    '99': '',
+    'mensual_autonomo': '',
+    'mensual_despacho': ''
+};
+
+var PLANS = {
+    '39': {
+        title: 'Activar Plan Autónomo / PYME — Oferta Anual (39 €/año)',
+        desc: '1 NIF Emisor · Acceso ilimitado Ordenador y Móvil · Conexión AEAT (.p12)',
+        renew: '59 €/año a partir del segundo año (sin permanencia)',
+        price: '39,00 € / primer año'
+    },
+    '99': {
+        title: 'Activar Plan Despacho Multi-NIF — Oferta Anual (99 €/año)',
+        desc: 'Multi-NIF Ilimitado (Comunidades y Sociedades) · Certificados .p12 independientes',
+        renew: '149 €/año a partir del segundo año (sin permanencia)',
+        price: '99,00 € / primer año'
+    },
+    'mensual_autonomo': {
+        title: 'Activar Plan Autónomo / PYME — Mensual (4,90 €/mes)',
+        desc: '1 NIF Emisor · Oferta los 3 primeros meses · Acceso Ordenador y Móvil',
+        renew: '7,90 €/mes a partir del 4º mes (cancela cuando quieras)',
+        price: '4,90 € / mes'
+    },
+    'mensual_despacho': {
+        title: 'Activar Plan Despacho Multi-NIF — Mensual (12,90 €/mes)',
+        desc: 'Multi-NIF Ilimitado · Oferta los 3 primeros meses · Ideal Administradores de Fincas',
+        renew: '19,90 €/mes a partir del 4º mes (cancela cuando quieras)',
+        price: '12,90 € / mes'
+    }
+};
+
+var CURRENT_PLAN = '39';
+
+function selectPlan(key) {
+    if (!PLANS[key]) key = '39';
+    CURRENT_PLAN = key;
+    var p = PLANS[key];
+    document.getElementById('planTitle').innerText = p.title;
+    document.getElementById('planDesc').innerText = p.desc;
+    document.getElementById('planRenew').innerText = p.renew;
+    document.getElementById('planPrice').innerText = p.price;
+
+    ['39', '99', 'mensual_autonomo', 'mensual_despacho'].forEach(function(k) {
+        var btn = document.getElementById('ps_' + k);
+        if (btn) btn.className = 'ps-btn' + (k === key ? ' active' : '');
+    });
+
+    var url = STRIPE_LINKS[key] || '';
+    document.getElementById('stripeBtn').href = url || '#';
+    document.getElementById('stripeConfigNotice').style.display = 'none';
+}
+
+function onStripePayClick(e) {
+    var url = STRIPE_LINKS[CURRENT_PLAN] || '';
+    if (!url) {
+        e.preventDefault();
+        var box = document.getElementById('stripeConfigNotice');
+        box.style.display = 'block';
+        box.innerHTML = 'La pasarela de tarjeta para esta modalidad está en activación. Mientras tanto, puedes usar el botón inferior de <strong>Transferencia Bancaria</strong> o empezar tu <strong>prueba gratuita de 15 días</strong> en <a href="login.html" style="color:#1e40af; font-weight:700;">Crear Cuenta Gratis</a>.';
+        return false;
+    }
+    return true;
+}
+
+function sendBankRequest() {
+    var fiscal = document.getElementById('fiscalName').value.trim() || 'Empresa / Autónomo';
+    var email = document.getElementById('fiscalEmail').value.trim() || '';
+    var p = PLANS[CURRENT_PLAN];
+    var subj = encodeURIComponent('Alta por Transferencia Factura-VeriFactu.es — ' + p.price);
+    var body = encodeURIComponent(
+        'Hola equipo de Factura-VeriFactu.es,\n\n' +
+        'Solicito factura oficial con IVA y número de cuenta IBAN para activar mi suscripción:\n\n' +
+        '- Plan elegido: ' + p.title + '\n' +
+        '- Empresa / NIF: ' + fiscal + '\n' +
+        '- Email de la cuenta: ' + email + '\n\nUn saludo.'
+    );
+    window.location.href = 'mailto:kodeksistemas@gmail.com?subject=' + subj + '&body=' + body;
+}
 
 (function init() {
     var params = new URLSearchParams(window.location.search);
     var plan = params.get('plan') || '39';
-    var p = params.get('p') || '';
-    var d = {};
-    if (p) {
-        try {
-            var b64 = p.replace(/-/g, '+').replace(/_/g, '/');
-            while (b64.length % 4) b64 += '=';
-            d = JSON.parse(decodeURIComponent(escape(atob(b64))));
-        } catch(e) {}
-    }
-    if (d.n) document.getElementById('compName').innerText = d.n + (d.d ? ' (' + d.d + ')' : '');
-    if (d.exp) document.getElementById('expBadge').innerText = 'EXPEDIENTE ' + d.exp + ' • KÓDEK SISTEMAS';
-
-    if (plan === '99') {
-        document.getElementById('planTitle').innerText = 'Activación Plan Despacho Multi-NIF (Oferta 99 €/año)';
-        document.getElementById('planDesc').innerText = 'Suscripción Anual Multi-NIF (NIFs Ilimitados) · Oferta Pre-1 de Enero (después 149 €/año)';
-        document.getElementById('planPrice').innerText = '99,00 € / primer año';
-        document.getElementById('stripeBtn').href = STRIPE_99;
-    } else if (plan === 'mensual_autonomo') {
-        document.getElementById('planTitle').innerText = 'Activación Plan Autónomo Mensual (4,90 €/mes)';
-        document.getElementById('planDesc').innerText = 'Plan Individual 1 NIF · 4,90 €/mes los 3 primeros meses (después 7,90 €/mes, sin permanencia)';
-        document.getElementById('planPrice').innerText = '4,90 € / mes';
-        document.getElementById('stripeBtn').href = STRIPE_39;
-    } else if (plan === 'mensual_despacho') {
-        document.getElementById('planTitle').innerText = 'Activación Plan Despacho Multi-NIF Mensual (12,90 €/mes)';
-        document.getElementById('planDesc').innerText = 'Plan Multi-NIF Ilimitado · 12,90 €/mes los 3 primeros meses (después 19,90 €/mes, sin permanencia)';
-        document.getElementById('planPrice').innerText = '12,90 € / mes';
-        document.getElementById('stripeBtn').href = STRIPE_99;
-    } else {
-        document.getElementById('planTitle').innerText = 'Activación Plan Autónomo / PYME (Oferta 39 €/año)';
-        document.getElementById('planDesc').innerText = 'Suscripción Anual 1 NIF · Oferta Pre-1 de Enero (después 59 €/año)';
-        document.getElementById('planPrice').innerText = '39,00 € / primer año';
-        document.getElementById('stripeBtn').href = STRIPE_39;
-    }
-    document.getElementById('directDeliver').href = 'entrega-verifactu.html?plan=' + plan + (p ? '&p=' + p : '');
-    window._vfData = d;
-    window._vfPlan = plan;
-    if (d.em) document.getElementById('fiscalEmail').value = d.em;
+    selectPlan(plan);
+    try {
+        var rawSess = localStorage.getItem('vf_user_session');
+        if (rawSess) {
+            var sess = JSON.parse(rawSess);
+            if (sess.name) document.getElementById('compName').innerText = sess.name + (sess.nif ? ' (' + sess.nif + ')' : '');
+            if (sess.email) document.getElementById('fiscalEmail').value = sess.email;
+            if (sess.name && sess.nif) document.getElementById('fiscalName').value = sess.name + ' - ' + sess.nif;
+        }
+    } catch(e) {}
 })();
-function sendBankRequestVF() {
-    var d = window._vfData || {};
-    var plan = window._vfPlan || '39';
-    var fiscal = document.getElementById('fiscalName').value || d.n || d.d || 'Empresa';
-    var email = document.getElementById('fiscalEmail').value || d.em || '';
-    var subj = encodeURIComponent('Solicitud Factura y Transferencia - VeriFactu Pro (' + (d.d || fiscal) + ')');
-    var body = encodeURIComponent('Hola equipo de KÓDEK Sistemas,\n\nSolicitamos factura oficial y número de cuenta IBAN para abonar por transferencia la Licencia FacturaE & VeriFactu Pro (' + plan + ' € IVA incl.).\n\n- Empresa / CIF: ' + fiscal + '\n- Dominio: ' + (d.d || '') + '\n- Expediente: ' + (d.exp || 'VF-2026') + '\n- Email de facturación: ' + email + '\n\nUn saludo.');
-    window.location.href = 'mailto:kodeksistemas@gmail.com?subject=' + subj + '&body=' + body;
-}
 </script>
 </body>
 </html>
