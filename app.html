@@ -1350,18 +1350,18 @@
                     </div>
                 </div>
 
-                <!-- Selector de Plan para que Mario pueda probar el bloqueo de 1 NIF vs Multi-NIF -->
+                <!-- Estado de Suscripción y Mejora de Plan -->
                 <div class="card" style="background:var(--brand-soft); border-color:var(--brand-border);">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                         <div>
-                            <h2 class="card-title" style="color:var(--brand);">Plan Activo en esta Cuenta</h2>
+                            <h2 class="card-title" style="color:var(--brand);">Tu Suscripción y Límites de NIF</h2>
                             <p class="card-sub" style="margin:0; color:var(--text-secondary);">
-                                En el <strong>Plan Autónomo (39 €/año oferta pre-1 Enero)</strong> el usuario solo puede facturar con <strong>1 único NIF</strong> (el campo NIF queda bloqueado una vez guardado y no puede crear más empresas). En el <strong>Plan Despacho / Administrador de Fincas (99 €/año)</strong> se desbloquea el selector Multi-NIF ilimitado.
+                                En el <strong>Plan Autónomo (39 €/año oferta pre-1 Enero)</strong> el titular fiscal queda fijado en <strong>1 único NIF emisor</strong>. Si gestionas varias empresas o comunidades de propietarios, puedes pasar al <strong>Plan Despacho Multi-NIF (99 €/año)</strong> en cualquier momento.
                             </p>
                         </div>
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                            <button type="button" class="btn btn-outline" id="btnSetPlanSingle" onclick="setAccountPlanType('single')">Probar como Plan Autónomo (1 NIF Bloqueado)</button>
-                            <button type="button" class="btn btn-success" id="btnSetPlanMulti" onclick="setAccountPlanType('multi')">Activar Modo Despacho Multi-NIF (99 €/año)</button>
+                            <a href="activar.html?plan=39" class="btn btn-outline">Activar Plan 1 NIF (39 €/año)</a>
+                            <a href="activar.html?plan=99" class="btn btn-success">Mejorar a Plan Multi-NIF (99 €/año)</a>
                         </div>
                     </div>
                 </div>
@@ -1512,7 +1512,7 @@
         </div>
         <div style="display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
             <button type="button" class="btn btn-outline" onclick="closeUpgradeModal()">Seguir con 1 solo NIF</button>
-            <button type="button" class="btn btn-success" onclick="setAccountPlanType('multi'); closeUpgradeModal();">Desbloquear Multi-NIF Ahora</button>
+            <a href="activar.html?plan=99" class="btn btn-success">Activar Plan Multi-NIF (99 €/año) &rarr;</a>
         </div>
     </div>
 </div>
@@ -1786,7 +1786,7 @@ function generateQrSvg(qrPayloadUrl) {
 function computeOfficialAeatHash(nif, num, fec, tipo, iva, tot, prevHash, isoTs) {
     // Formato canónico Orden Ministerial HAC/1177/2024 AEAT:
     // IDEmisorFactura=...&NumSerieFactura=...&FechaExpedicionFactura=...&TipoFactura=...&CuotaTotal=...&ImporteTotal=...&Huella=...&FechaHoraHusoGenRegistro=...
-    var prev = (prevHash && !prevHash.startswith && prevHash.indexOf('00000000') !== 0) ? prevHash : '';
+    var prev = (prevHash && String(prevHash).indexOf('00000000') !== 0) ? String(prevHash).trim() : '';
     var canonical = 'IDEmisorFactura=' + nif.trim().toUpperCase() +
         '&NumSerieFactura=' + num.trim() +
         '&FechaExpedicionFactura=' + fec.trim() +
