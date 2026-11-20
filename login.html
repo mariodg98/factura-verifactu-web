@@ -393,27 +393,48 @@ async function handleAffiliateRegister(e) {
 
     localStorage.setItem('vf_user_session', JSON.stringify(userSession));
     localStorage.setItem('vf_my_affiliate_code', code);
-    localStorage.setItem('vf_open_aff', '1');
-    window.location.href = 'app.html';
+    window.location.href = 'afiliados.html';
 }
 
 async function handleRegister(e) {
     e.preventDefault();
     var name = document.getElementById('regName').value.trim();
-    var nif = document.getElementById('regNif').value.trim().toUpperCase();
+    var nif = document.getElementById('regNif').value.trim().toUpperCase().replace(/\s+/g, '');
     var email = document.getElementById('regEmail').value.trim().toLowerCase();
     var pass = document.getElementById('regPass').value;
     var plan = document.getElementById('regPlan').value;
     var ref = localStorage.getItem('vf_affiliate_ref') || '';
+    var errBox = document.getElementById('authErrorBox');
+    errBox.style.display = 'none';
+
+    // Control anti-abuso de prueba gratuita (comprueba si ese Email o NIF ya existe en Supabase)
+    if (supabaseClient) {
+        try {
+            var chkEmail = await supabaseClient.from('perfiles_cuenta').select('id').eq('email', email).limit(1);
+            if (chkEmail.data && chkEmail.data.length > 0) {
+                errBox.style.display = 'block';
+                errBox.innerText = 'Este correo electrónico ya tiene una cuenta registrada. Inicia sesión en la pestaña "Iniciar Sesión".';
+                return;
+            }
+            var chkNif = await supabaseClient.from('empresas_emisoras').select('id').eq('nif_cif', nif).limit(1);
+            if (chkNif.data && chkNif.data.length > 0) {
+                errBox.style.display = 'block';
+                errBox.innerText = 'El NIF/CIF ' + nif + ' ya ha disfrutado de una prueba gratuita de 15 días. Inicia sesión en tu cuenta existente o activa tu suscripción.';
+                return;
+            }
+        } catch(e) {}
+    }
 
     var now = new Date();
     var trialEnd = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000);
 
     var userSession = {
+        role: 'client',
         email: email,
         name: name,
         nif: nif,
         plan: plan,
+        sub_status: 'trial_15d',
         affiliate_ref: ref,
         trial_start: now.toISOString(),
         trial_end: trialEnd.toISOString(),
@@ -426,8 +447,13 @@ async function handleRegister(e) {
             var signRes = await supabaseClient.auth.signUp({
                 email: email,
                 password: pass,
-                options: { data: { nombre_titular: name, nif_cif: nif, plan_tipo: plan, codigo_afiliado_origen: ref } }
+                options: { data: { nombre_titular: name, nif_cif: nif, plan_tipo: plan, codigo_afiliado_origen: ref, rol: 'client' } }
             });
+            if (signRes.error && signRes.error.message && signRes.error.message.toLowerCase().indexOf('already') !== -1) {
+                errBox.style.display = 'block';
+                errBox.innerText = 'Este correo ya está registrado. Entra desde la pestaña "Iniciar Sesión".';
+                return;
+            }
             var uid = (signRes.data && signRes.data.user) ? signRes.data.user.id : null;
             if (uid) {
                 userSession.user_id = uid;
@@ -493,6 +519,10 @@ async function handleLogin(e) {
     e.preventDefault();
     var email = document.getElementById('logEmail').value.trim().toLowerCase();
     var pass = document.getElementById('logPass').value;
+    var roleDetected = 'client';
+    var affCodeDetected = '';
+    var subStatus = 'trial_15d';
+    var trialEndStr = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString();
 
     if (supabaseClient) {
         try {
@@ -503,29 +533,40 @@ async function handleLogin(e) {
                 box.innerText = 'Credenciales incorrectas: ' + res.error.message;
                 return;
             }
+            var u = res.data && res.data.user ? res.data.user : null;
+            if (u && u.user_metadata && u.user_metadata.rol === 'affiliate') {
+                roleDetected = 'affiliate';
+                affCodeDetected = u.user_metadata.mi_codigo_afiliado || 'partner';
+            }
+            if (u) {
+                var prof = await supabaseClient.from('perfiles_cuenta').select('*').eq('id', u.id).single();
+                if (prof.data) {
+                    if (prof.data.mi_codigo_afiliado) {
+                        roleDetected = 'affiliate';
+                        affCodeDetected = prof.data.mi_codigo_afiliado;
+                    }
+                    if (prof.data.estado_suscripcion) subStatus = prof.data.estado_suscripcion;
+                    if (prof.data.fecha_fin_trial) trialEndStr = prof.data.fecha_fin_trial;
+                }
+            }
         } catch(err) {}
     }
 
     var existingRaw = localStorage.getItem('vf_user_session');
-    if (existingRaw) {
-        var sess = JSON.parse(existingRaw);
-        sess.email = email;
-        sess.logged_at = new Date().toISOString();
-        localStorage.setItem('vf_user_session', JSON.stringify(sess));
+    var sess = existingRaw ? JSON.parse(existingRaw) : {};
+    sess.email = email;
+    sess.role = roleDetected;
+    sess.sub_status = subStatus;
+    sess.trial_end = trialEndStr;
+    if (affCodeDetected) sess.my_affiliate_code = affCodeDetected;
+    sess.logged_at = new Date().toISOString();
+    localStorage.setItem('vf_user_session', JSON.stringify(sess));
+
+    if (roleDetected === 'affiliate') {
+        window.location.href = 'afiliados.html';
     } else {
-        var now = new Date();
-        var trialEnd = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000);
-        localStorage.setItem('vf_user_session', JSON.stringify({
-            email: email,
-            name: 'Mi Empresa / Despacho',
-            nif: 'B84521904',
-            plan: localStorage.getItem('vf_cloud_plan_type') || 'single',
-            trial_start: now.toISOString(),
-            trial_end: trialEnd.toISOString(),
-            logged_at: now.toISOString()
-        }));
+        window.location.href = 'app.html';
     }
-    window.location.href = 'app.html';
 }
 </script>
 </body>
