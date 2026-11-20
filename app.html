@@ -701,7 +701,7 @@
             overflow-y: auto;
         }
 
-        /* Folio A4 de Factura para Impresión */
+        /* Folio A4 de Factura para Impresión (sin hueco superior) */
         .invoice-a4-sheet {
             background: #ffffff;
             border: 1px solid var(--border-strong);
@@ -709,23 +709,48 @@
             padding: 28px;
             color: #0f172a;
         }
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
         @media print {
-            body * { visibility: hidden; }
-            #invoiceModal, #invoiceModal * { visibility: visible; }
-            .no-print { display: none !important; }
+            html, body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            .app-shell, .mobile-bottom-nav, #upgradeModal, #trialExpiredModal, .no-print {
+                display: none !important;
+            }
             #invoiceModal {
-                position: absolute;
-                inset: 0;
-                background: #ffffff;
-                padding: 0;
+                display: block !important;
+                position: static !important;
+                inset: auto !important;
+                background: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: visible !important;
             }
-            .modal-card {
-                box-shadow: none;
-                max-width: 100%;
-                max-height: none;
-                padding: 0;
+            #invoiceModal .modal-card {
+                display: block !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                max-height: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: visible !important;
             }
-            .invoice-a4-sheet { border: none; padding: 0; }
+            .invoice-a4-sheet {
+                border: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
         }
     </style>
 </head>
@@ -787,12 +812,6 @@
                     <button class="nav-btn" id="nav_aeat" onclick="openSection('aeat')">
                         <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                         Conexión AEAT (.p12)
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-btn" id="nav_afiliados" onclick="openSection('afiliados')">
-                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        Panel de Afiliados (30%)
                     </button>
                 </li>
                 <li class="nav-item">
@@ -1322,83 +1341,6 @@
                 </div>
             </section>
 
-            <!-- ================= SECCIÓN 6: PANEL DE AFILIADOS (35% BASE / 45% COLECTIVOS) ================= -->
-            <section id="sec_afiliados" style="display:none;">
-                <div class="page-header">
-                    <div>
-                        <h1 class="page-title">Programa de Partners, Portales y Colectivos Profesionales</h1>
-                        <p class="page-subtitle">Pensado para portales de administradores de fincas (como Presidente de la Comunidad), colegios profesionales y asesorías.</p>
-                    </div>
-                </div>
-
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-label"><span>TRAMO DE COMISIÓN ACTIVO</span></div>
-                        <div class="kpi-value" style="color:var(--brand);" id="affKpiPct">30%</div>
-                        <div class="kpi-foot" id="affKpiTierFoot">Tramo base (sube al 40% con +20 cuentas)</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label"><span>USUARIOS EN PRUEBA (15 DÍAS)</span></div>
-                        <div class="kpi-value" id="affKpiTrials">0</div>
-                        <div class="kpi-foot">Registrados desde tu enlace</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label"><span>SUSCRIPCIONES ACTIVADAS</span></div>
-                        <div class="kpi-value" style="color:var(--success);" id="affKpiPaid">0</div>
-                        <div class="kpi-foot">Clientes con plan anual o mensual</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label"><span>COMISIONES GENERADAS</span></div>
-                        <div class="kpi-value" style="color:var(--success);" id="affKpiEur">0,00 €</div>
-                        <div class="kpi-foot">Liquidación mensual por transferencia</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2 class="card-title">Tu Enlace Oficial de Partner / Comunidad</h2>
-                    <p class="card-sub">Comparte este enlace en tu artículo, newsletter o directorio. Cada lector disfruta de 15 días de prueba gratis + la oferta pre-1 de enero (39 €/año o 99 €/año Multi-NIF), y su registro queda vinculado automáticamente a tu código en la base de datos.</p>
-                    <div class="grid-3" style="align-items:end;">
-                        <div>
-                            <label>Tu Código de Partner:</label>
-                            <input type="text" id="affCodeInput" value="presidente-comunidad" oninput="updateAffLink(); loadAffiliateConversionsFromSupabase();">
-                        </div>
-                        <div>
-                            <label>Enlace de Seguimiento Directo (Cookie 90 días):</label>
-                            <input type="text" id="affLinkOutput" value="https://factura-verifactu.es/?ref=presidente-comunidad" readonly>
-                        </div>
-                        <div>
-                            <button type="button" class="btn btn-primary" onclick="copyAffLink()" style="width:100%;">Copiar Enlace de Partner</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <div>
-                            <h2 class="card-title">Usuarios Referidos desde tu Enlace (Sincronizado en Vivo)</h2>
-                            <p class="card-sub" style="margin:0;">Listado en tiempo real de empresas y despachos que han creado cuenta a través de tu enlace de afiliado.</p>
-                        </div>
-                        <button type="button" class="btn btn-outline" onclick="loadAffiliateConversionsFromSupabase()">Actualizar Datos</button>
-                    </div>
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Fecha Alta</th>
-                                    <th>Usuario / Empresa Referida</th>
-                                    <th>Estado</th>
-                                    <th>Plan Seleccionado</th>
-                                    <th>Tu Comisión (30% / 40%)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="affConversionsBody">
-                                <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Aún no hay registros con este código. Comparte tu enlace para ver aquí tus primeros referidos en directo.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
             <!-- ================= SECCIÓN 7: DATOS FISCALES Y PLAN (CONTROL 1 NIF vs MULTI-NIF) ================= -->
             <section id="sec_ajustes" style="display:none;">
                 <div class="page-header">
@@ -1595,14 +1537,66 @@
     </div>
 </div>
 
+<!-- MODAL 3: BLOQUEO TRAS FIN DE PRUEBA GRATUITA DE 15 DÍAS (DÍA 16) -->
+<div class="modal-backdrop" id="trialExpiredModal">
+    <div class="modal-card" style="max-width:520px;">
+        <h3 style="margin:0 0 8px; font-size:18px; color:var(--text-primary);">Tu periodo de prueba gratuita de 15 días ha finalizado</h3>
+        <p style="margin:0 0 14px; color:var(--text-secondary); font-size:13.5px;">
+            Todas tus facturas emitidas y tu histórico siguen guardados de forma segura, pero para emitir nuevas facturas VeriFactu o remitir registros a la AEAT necesitas activar tu suscripción.
+        </p>
+        <div style="background:var(--brand-soft); border:1px solid var(--brand-border); border-radius:8px; padding:14px; margin-bottom:18px; font-size:13px;">
+            <strong>Oferta de Lanzamiento antes del 1 de Enero:</strong><br>
+            • Plan Autónomo (1 NIF): <strong>39 €/año</strong> (o 4,90 €/mes)<br>
+            • Plan Despacho Multi-NIF: <strong>99 €/año</strong> (o 12,90 €/mes)
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
+            <a href="activar.html?plan=39" class="btn btn-primary">Activar Plan 1 NIF (39 €/año)</a>
+            <a href="activar.html?plan=99" class="btn btn-success">Activar Multi-NIF (99 €/año)</a>
+        </div>
+    </div>
+</div>
+
 <script>
 // ================= CONEXIÓN CLOUD SUPABASE (SINCRONIZACIÓN MÓVIL <-> PC) =================
 (function enforceAuthGuard() {
-    var sess = localStorage.getItem('vf_user_session');
-    if (!sess) {
+    var raw = localStorage.getItem('vf_user_session');
+    if (!raw) {
+        window.location.replace('login.html?mode=login');
+        return;
+    }
+    try {
+        var sess = JSON.parse(raw);
+        // Si es una cuenta de afiliado/partner, no tiene acceso a facturación: solo a afiliados.html
+        if (sess.role === 'affiliate') {
+            window.location.replace('afiliados.html');
+            return;
+        }
+        // Si vuelve de Stripe con ?paid=ok, activamos su suscripción
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('paid') === 'ok') {
+            sess.sub_status = 'active_annual';
+            var pType = params.get('plan');
+            if (pType === 'multi' || pType === '99' || pType === 'mensual_despacho') {
+                sess.plan = 'multi';
+                localStorage.setItem('vf_cloud_plan_type', 'multi');
+            }
+            localStorage.setItem('vf_user_session', JSON.stringify(sess));
+        }
+    } catch(e) {
         window.location.replace('login.html?mode=login');
     }
 })();
+
+function isTrialExpired() {
+    try {
+        var raw = localStorage.getItem('vf_user_session');
+        if (!raw) return false;
+        var sess = JSON.parse(raw);
+        if (sess.sub_status === 'active_annual' || sess.sub_status === 'active_monthly') return false;
+        if (sess.trial_end && Date.now() > new Date(sess.trial_end).getTime()) return true;
+    } catch(e) {}
+    return false;
+}
 
 async function logoutUserSession() {
     localStorage.removeItem('vf_user_session');
@@ -2063,7 +2057,7 @@ function saveCompanyExpenses(arr) {
 
 // ================= NAVEGACIÓN ENTRE SECCIONES =================
 function openSection(sec) {
-    var all = ['dashboard', 'facturas', 'presupuestos', 'gastos', 'aeat', 'afiliados', 'ajustes', 'instrucciones'];
+    var all = ['dashboard', 'facturas', 'presupuestos', 'gastos', 'aeat', 'ajustes', 'instrucciones'];
     all.forEach(function(s) {
         var el = document.getElementById('sec_' + s);
         if (el) el.style.display = (s === sec) ? 'block' : 'none';
@@ -2183,6 +2177,10 @@ function recalcFormTotals() {
 }
 
 function emitVeriFactuInvoice() {
+    if (isTrialExpired()) {
+        document.getElementById('trialExpiredModal').style.display = 'flex';
+        return;
+    }
     var comp = getActiveCompany();
     var type = document.getElementById('fType').value;
     var serie = document.getElementById('fSerie').value.trim() || 'F2026';
@@ -2932,12 +2930,11 @@ refreshNextCorrelative();
 renderFormLines();
 renderQuoteLines();
 renderAllTables();
-initAffiliateCodeFromSession();
 pullCloudDataFromSupabase();
-if (localStorage.getItem('vf_open_aff') === '1') {
-    localStorage.removeItem('vf_open_aff');
-    openSection('afiliados');
-} else if (localStorage.getItem('vf_open_guide') === '1') {
+if (isTrialExpired()) {
+    document.getElementById('trialExpiredModal').style.display = 'flex';
+}
+if (localStorage.getItem('vf_open_guide') === '1') {
     localStorage.removeItem('vf_open_guide');
     openSection('instrucciones');
 }
