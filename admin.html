@@ -164,12 +164,12 @@
 <div id="adminLoginGate" class="login-gate">
     <h1 style="margin:0 0 6px; font-size:19px; font-weight:800;">Acceso Exclusivo Administrador</h1>
     <p style="margin:0 0 18px; font-size:13px; color:var(--muted);">
-        Inicia sesión con tu cuenta maestra de administrador (<strong>kodeksistemas@gmail.com</strong>) para consultar y liquidar las comisiones de tus afiliados.
+        Inicia sesión con tu cuenta maestra de administrador para consultar y liquidar las comisiones de tus afiliados.
     </p>
     <div id="adminErr" style="display:none; background:var(--danger-soft); color:var(--danger); padding:9px 12px; border-radius:6px; font-size:12.5px; margin-bottom:12px;"></div>
     <form onsubmit="handleAdminLogin(event)">
         <label>Email de Administrador:</label>
-        <input type="email" id="admEmail" required value="kodeksistemas@gmail.com">
+        <input type="email" id="admEmail" required value="mariodg98@hotmail.com">
         <label>Contraseña de tu cuenta en Supabase:</label>
         <input type="password" id="admPass" required placeholder="Tu contraseña">
         <button type="submit" class="btn btn-primary" style="width:100%;">Entrar al Panel Maestro</button>
@@ -249,7 +249,7 @@
 </div>
 
 <script>
-var ADMIN_ALLOWED_EMAILS = ['kodeksistemas@gmail.com'];
+var ADMIN_ALLOWED_EMAILS = ['mariodg98@hotmail.com', 'kodeksistemas@gmail.com'];
 var SUPABASE_URL = 'https://tbxjgigjmakgpogotgjr.supabase.co';
 var SUPABASE_ANON_KEY = 'sb_publishable_NCGpWz9PyR5JfsYrSaQx8Q_PO5H2Swz';
 var sbClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
