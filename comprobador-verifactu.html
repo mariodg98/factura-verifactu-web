@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprobador Gratuito de Facturas VeriFactu (RD 1007/2023) | Factura-VeriFactu.es</title>
+    <meta name="description" content="Comprueba gratis en 10 segundos si tus facturas PDF cumplen con el Real Decreto 1007/2023 (VeriFactu AEAT): código QR tributario, huella SHA-256 y riesgo de sanción.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --bg-subtle: #f8fafc;
+            --text-main: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --brand: #1e40af;
+            --brand-hover: #1e3a8a;
+            --brand-soft: #eff6ff;
+            --success: #15803d;
+            --success-soft: #f0fdf4;
+            --success-border: #bbf7d0;
+            --danger: #b91c1c;
+            --danger-soft: #fef2f2;
+            --danger-border: #fecaca;
+            --warning: #b45309;
+            --warning-soft: #fffbeb;
+            --warning-border: #fde68a;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--bg-subtle);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .nav-inner {
+            max-width: 1020px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+        .logo-mark {
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            background: var(--brand);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s;
+        }
+        .btn-primary { background: var(--brand); color: #ffffff; }
+        .btn-primary:hover { background: var(--brand-hover); }
+        .btn-outline { background: #ffffff; color: var(--text-main); border-color: var(--border-strong); }
+        .btn-outline:hover { background: var(--bg-subtle); }
+
+        main {
+            max-width: 920px;
+            margin: 34px auto 64px;
+            padding: 0 20px;
+        }
+        .hero-box {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .eyebrow {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--brand);
+            background: var(--brand-soft);
+            padding: 5px 12px;
+            border-radius: 5px;
+            margin-bottom: 12px;
+        }
+        h1 {
+            font-size: 32px;
+            line-height: 1.18;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            margin: 0 0 10px;
+        }
+        @media (max-width: 640px) {
+            h1 { font-size: 24px; }
+        }
+        .hero-sub {
+            max-width: 680px;
+            margin: 0 auto;
+            color: var(--text-body);
+            font-size: 15.5px;
+        }
+
+        .tool-card {
+            background: #ffffff;
+            border: 1px solid var(--border-strong);
+            border-radius: 12px;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .mode-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-subtle);
+        }
+        .mode-tab {
+            padding: 15px 16px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .mode-tab.active {
+            background: #ffffff;
+            color: var(--brand);
+            border-bottom-color: var(--brand);
+        }
+        .tool-body {
+            padding: 28px;
+        }
+        @media (max-width: 640px) {
+            .tool-body { padding: 20px 16px; }
+        }
+
+        .dropzone {
+            border: 2px dashed var(--border-strong);
+            border-radius: 10px;
+            background: var(--bg-subtle);
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--brand);
+            background: var(--brand-soft);
+        }
+        .privacy-note {
+            margin-top: 12px;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+        @media (max-width: 680px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-strong);
+            border-radius: 7px;
+            background: #ffffff;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        /* Panel de Resultado */
+        #resultBox {
+            display: none;
+            background: #ffffff;
+            border: 1px solid var(--border-strong);
+            border-radius: 12px;
+            padding: 26px 28px;
+            margin-bottom: 24px;
+        }
+        .res-banner {
+            padding: 16px 18px;
+            border-radius: 9px;
+            margin-bottom: 18px;
+            border: 1px solid transparent;
+        }
+        .res-danger { background: var(--danger-soft); border-color: var(--danger-border); color: var(--danger); }
+        .res-warning { background: var(--warning-soft); border-color: var(--warning-border); color: var(--warning); }
+        .res-success { background: var(--success-soft); border-color: var(--success-border); color: var(--success); }
+
+        .check-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 11px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .check-row:last-child { border-bottom: none; }
+        .check-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .pill-ok { background: var(--success-soft); color: var(--success); border: 1px solid var(--success-border); }
+        .pill-fail { background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger-border); }
+        .pill-warn { background: var(--warning-soft); color: var(--warning); border: 1px solid var(--warning-border); }
+
+        .cta-box {
+            margin-top: 20px;
+            background: var(--brand-soft);
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        @media (max-width: 780px) {
+            .info-grid { grid-template-columns: 1fr; }
+        }
+        .info-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px;
+        }
+        .info-card h3 {
+            margin: 0 0 6px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .info-card p {
+            margin: 0;
+            font-size: 13.5px;
+            color: var(--text-body);
+        }
+
+        footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 28px 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+        footer a { color: #93c5fd; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-inner">
+        <a href="index.html" class="logo-link">
+            <div class="logo-mark">VF</div>
+            <div>
+                <strong style="display:block; font-size:15px; line-height:1.1;">Factura-VeriFactu.es</strong>
+                <span style="font-size:11px; color:var(--text-muted);">Comprobador Gratuito RD 1007/2023</span>
+            </div>
+        </a>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <a href="index.html" class="btn btn-outline" style="padding:8px 14px; font-size:13px;">Inicio</a>
+            <a href="login.html" class="btn btn-primary" style="padding:8px 14px; font-size:13px;">Probar 15 días gratis</a>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="hero-box">
+        <span class="eyebrow">HERRAMIENTA GRATUITA · SIN REGISTRO · 100% PRIVADA</span>
+        <h1>Comprobador de Facturas VeriFactu (AEAT)</h1>
+        <p class="hero-sub">
+            Verifica en 10 segundos si las facturas que emites hoy cumplen con el <strong>Real Decreto 1007/2023 y la Orden HAC/1177/2024</strong> o si estás expuesto a las sanciones de Hacienda.
+        </p>
+    </div>
+
+    <div class="tool-card">
+        <div class="mode-tabs">
+            <button type="button" class="mode-tab active" id="tabPdf" onclick="switchMode('pdf')">1. Analizar mi Factura PDF / XML</button>
+            <button type="button" class="mode-tab" id="tabQuiz" onclick="switchMode('quiz')">2. Test Rápido (Sin subir archivo)</button>
+        </div>
+
+        <div class="tool-body">
+            <!-- MODO 1: SUBIR PDF -->
+            <div id="panePdf">
+                <div class="dropzone" id="dropzone" onclick="document.getElementById('pdfInput').click()">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="1.8" style="margin-bottom:8px;">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="12" y1="18" x2="12" y2="12"/>
+                        <polyline points="9 15 12 12 15 15"/>
+                    </svg>
+                    <div style="font-size:15.5px; font-weight:700; color:var(--text-main); margin-bottom:4px;">
+                        Pulsa aquí o arrastra una factura actual (.PDF o .XML FacturaE)
+                    </div>
+                    <div style="font-size:13px; color:var(--text-muted);">
+                        Analizamos los metadatos, el código QR de cotejo AEAT y las referencias de encadenamiento VeriFactu.
+                    </div>
+                    <input type="file" id="pdfInput" accept=".pdf,.xml" style="display:none;" onchange="analyzeUploadedFile(this.files[0])">
+                </div>
+                <div class="privacy-note">
+                    <strong>Privacidad garantizada:</strong> el análisis se ejecuta íntegramente en tu navegador. Tu factura nunca se sube ni se guarda en ningún servidor.
+                </div>
+            </div>
+
+            <!-- MODO 2: TEST RÁPIDO -->
+            <div id="paneQuiz" style="display:none;">
+                <div class="form-grid">
+                    <div>
+                        <label>1. ¿Con qué herramienta creas tus facturas actualmente?</label>
+                        <select id="qTool">
+                            <option value="excel">Microsoft Excel, Word, Google Docs o Canva</option>
+                            <option value="old_app">Programa antiguo instalado en el ordenador (sin conexión AEAT)</option>
+                            <option value="cloud_no_qr">Programa online sin QR tributario ni encadenamiento</option>
+                            <option value="verifactu">Software ya adaptado a VeriFactu (RD 1007/2023)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>2. ¿Tus facturas incluyen el código QR oficial de la AEAT?</label>
+                        <select id="qQr">
+                            <option value="no">No llevan código QR tributario</option>
+                            <option value="unsure">No estoy seguro</option>
+                            <option value="yes">Sí, llevan QR con enlace a la sede electrónica de la AEAT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>3. ¿Puedes borrar o modificar una factura ya emitida?</label>
+                        <select id="qImmutable">
+                            <option value="editable">Sí, puedo editar el archivo o borrarla si me equivoco</option>
+                            <option value="locked">No, el sistema las bloquea y solo permite rectificativas (R1)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>4. ¿Cuál es tu perfil profesional?</label>
+                        <select id="qProfile">
+                            <option value="autonomo">Autónomo o pequeña empresa (1 NIF)</option>
+                            <option value="despacho">Administrador de fincas, gestoría o varias sociedades (Multi-NIF)</option>
+                            <option value="sanitario">Psicólogo, fisioterapeuta o clínica (Exento de IVA Art. 20)</option>
+                            <option value="gremio">Reformas, instalaciones o servicios a domicilio</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" style="width:100%; padding:12px;" onclick="runQuickQuiz()">
+                    Comprobar Cumplimiento VeriFactu Ahora &rarr;
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULTADO DEL DIAGNÓSTICO -->
+    <div id="resultBox">
+        <div id="resBanner" class="res-banner"></div>
+        <div id="resChecks"></div>
+        <div class="cta-box">
+            <div style="flex:1; min-width:240px;">
+                <strong style="display:block; font-size:15.5px; color:var(--text-main); margin-bottom:3px;" id="ctaTitle">
+                    Adapta tu facturación al RD 1007/2023 en menos de 2 minutos
+                </strong>
+                <span style="font-size:13.5px; color:var(--text-body);" id="ctaDesc">
+                    Prueba Factura-VeriFactu.es 15 días gratis sin tarjeta de crédito. Oferta pre-1 de Enero desde 39 €/año.
+                </span>
+            </div>
+            <a href="login.html" id="ctaBtn" class="btn btn-primary" style="white-space:nowrap;">Empezar 15 días gratis &rarr;</a>
+        </div>
+    </div>
+
+    <!-- CLAVES LEGALES PARA SEO Y EDUCACIÓN -->
+    <div class="info-grid">
+        <div class="info-card">
+            <h3>1. Código QR Tributario Obligatorio</h3>
+            <p>La Orden HAC/1177/2024 exige imprimir un código QR con la URL oficial de cotejo de la AEAT y la leyenda «VERI*FACTU» o factura verificable.</p>
+        </div>
+        <div class="info-card">
+            <h3>2. Huella SHA-256 Inalterable</h3>
+            <p>Cada factura debe encadenarse criptográficamente con la anterior. Ya no está permitido borrar facturas ni sobrescribir archivos de Excel o Word.</p>
+        </div>
+        <div class="info-card">
+            <h3>3. Sanciones Art. 201 bis LGT</h3>
+            <p>Utilizar sistemas de facturación no adaptados al Real Decreto 1007/2023 conlleva sanciones tributarias que pueden alcanzar los 50.000 € por ejercicio.</p>
+        </div>
+    </div>
+</main>
+
+<footer>
+    Factura-VeriFactu.es · Kódek Sistemas · <a href="index.html">Inicio</a> · <a href="legal.html">Aviso Legal y Privacidad</a> · <a href="mailto:kodeksistemas@gmail.com">kodeksistemas@gmail.com</a>
+</footer>
+
+<script>
+function switchMode(mode) {
+    document.getElementById('tabPdf').className = mode === 'pdf' ? 'mode-tab active' : 'mode-tab';
+    document.getElementById('tabQuiz').className = mode === 'quiz' ? 'mode-tab active' : 'mode-tab';
+    document.getElementById('panePdf').style.display = mode === 'pdf' ? 'block' : 'none';
+    document.getElementById('paneQuiz').style.display = mode === 'quiz' ? 'block' : 'none';
+}
+
+var dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', function() { dz.classList.remove('dragover'); });
+dz.addEventListener('drop', function(e) {
+    e.preventDefault();
+    dz.classList.remove('dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        analyzeUploadedFile(e.dataTransfer.files[0]);
+    }
+});
+
+function analyzeUploadedFile(file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+        var bytes = new Uint8Array(ev.target.result);
+        var text = '';
+        var limit = Math.min(bytes.length, 600000);
+        for (var i = 0; i < limit; i++) {
+            text += String.fromCharCode(bytes[i]);
+        }
+        var lower = text.toLowerCase();
+
+        var hasVerifactuText = lower.indexOf('verifactu') !== -1 || lower.indexOf('veri*factu') !== -1 || lower.indexOf('hac/1177/2024') !== -1 || lower.indexOf('1007/2023') !== -1;
+        var hasAeatQrUrl = lower.indexOf('agenciatributaria.gob.es') !== -1 || lower.indexOf('validarqr') !== -1 || lower.indexOf('tike-cont') !== -1 || lower.indexOf('prewww2.aeat.es') !== -1;
+        var hasHashOrCsv = lower.indexOf('sha-256') !== -1 || lower.indexOf('huella') !== -1 || lower.indexOf('csv') !== -1 || lower.indexOf('encadenado') !== -1;
+
+        var detectedOffice = '';
+        if (lower.indexOf('microsoft excel') !== -1 || lower.indexOf('excel') !== -1) detectedOffice = 'Microsoft Excel';
+        else if (lower.indexOf('microsoft word') !== -1 || lower.indexOf('word') !== -1) detectedOffice = 'Microsoft Word';
+        else if (lower.indexOf('libreoffice') !== -1 || lower.indexOf('openoffice') !== -1) detectedOffice = 'LibreOffice / OpenOffice';
+        else if (lower.indexOf('canva') !== -1) detectedOffice = 'Canva';
+        else if (lower.indexOf('google docs') !== -1 || lower.indexOf('skia/pdf') !== -1) detectedOffice = 'Navegador / Editor de documentos genérico';
+
+        var score = (hasVerifactuText ? 1 : 0) + (hasAeatQrUrl ? 1 : 0) + (hasHashOrCsv ? 1 : 0);
+
+        var checks = [
+            {
+                ok: hasAeatQrUrl,
+                title: 'Código QR y enlace oficial de cotejo AEAT (ValidarQR)',
+                desc: hasAeatQrUrl
+                    ? 'Se ha detectado una referencia a la Sede Electrónica de la Agencia Tributaria en el documento.'
+                    : 'No se detecta el enlace oficial de validación QR de la AEAT exigido por la Orden HAC/1177/2024.'
+            },
+            {
+                ok: hasVerifactuText,
+                title: 'Leyenda normativa VERI*FACTU / RD 1007/2023',
+                desc: hasVerifactuText
+                    ? 'El documento contiene mención expresa al sistema VeriFactu / normativa AEAT.'
+                    : 'Falta la mención obligatoria «Factura verificable en la sede electrónica de la AEAT» o «VERI*FACTU».'
+            },
+            {
+                ok: hasHashOrCsv,
+                title: 'Trazabilidad criptográfica (Huella SHA-256 / CSV AEAT)',
+                desc: hasHashOrCsv
+                    ? 'Se detectan indicadores de huella criptográfica o código seguro de verificación.'
+                    : 'No se detecta huella SHA-256 encadenada ni código de remisión. El archivo podría ser manipulable sin rastro.'
+            }
+        ];
+
+        if (detectedOffice && score < 2) {
+            checks.unshift({
+                ok: false,
+                title: 'Origen detectado en metadatos del PDF: ' + detectedOffice,
+                desc: 'Generar facturas desde ' + detectedOffice + ' incumple el Real Decreto 1007/2023 al no garantizar la inalterabilidad ni el encadenamiento de registros.'
+            });
+        }
+
+        renderDiagnosis(score, file.name, checks, 'autonomo');
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function runQuickQuiz() {
+    var tool = document.getElementById('qTool').value;
+    var qr = document.getElementById('qQr').value;
+    var imm = document.getElementById('qImmutable').value;
+    var prof = document.getElementById('qProfile').value;
+
+    var okTool = tool === 'verifactu';
+    var okQr = qr === 'yes';
+    var okImm = imm === 'locked';
+    var score = (okTool ? 1 : 0) + (okQr ? 1 : 0) + (okImm ? 1 : 0);
+
+    var checks = [
+        {
+            ok: okTool,
+            title: 'Sistema Informático de Facturación (SIF) adaptado',
+            desc: okTool
+                ? 'Indicas que ya utilizas un software adaptado a VeriFactu.'
+                : 'Facturar con Excel, Word o programas no actualizados incumple el RD 1007/2023 y expone tu actividad a sanciones de hasta 50.000 € (Art. 201 bis LGT).'
+        },
+        {
+            ok: okQr,
+            title: 'Código QR tributario oficial AEAT',
+            desc: okQr
+                ? 'Tus facturas incluyen el código QR obligatorio para que el cliente y Hacienda puedan cotejarlas.'
+                : 'Todas las facturas (ordinarias y simplificadas) deben incorporar el QR tributario conforme al anexo de la Orden HAC/1177/2024.'
+        },
+        {
+            ok: okImm,
+            title: 'Inalterabilidad y prohibición de borrado',
+            desc: okImm
+                ? 'Tu sistema impide borrar facturas y utiliza rectificativas R1 encadenadas.'
+                : 'Poder editar o borrar facturas ya emitidas está expresamente prohibido por la normativa antifraude. Cualquier error debe corregirse con una factura rectificativa R1.'
+        }
+    ];
+
+    renderDiagnosis(score, 'Evaluación de tu sistema actual', checks, prof);
+}
+
+function renderDiagnosis(score, sourceLabel, checks, profile) {
+    var box = document.getElementById('resultBox');
+    var banner = document.getElementById('resBanner');
+    var list = document.getElementById('resChecks');
+
+    if (score >= 3) {
+        banner.className = 'res-banner res-success';
+        banner.innerHTML = '<strong>Resultado (' + sourceLabel + '): Cumple los requisitos principales VeriFactu.</strong><br><span style="font-size:13.5px;">Tu factura incluye indicadores de QR AEAT, referencia normativa y trazabilidad. Si buscas reducir lo que pagas al mes por tu software actual, puedes probar Factura-VeriFactu.es desde 39 €/año.</span>';
+    } else if (score === 2) {
+        banner.className = 'res-banner res-warning';
+        banner.innerHTML = '<strong>Resultado (' + sourceLabel + '): Cumplimiento parcial — Revisa los puntos pendientes.</strong><br><span style="font-size:13.5px;">Falta al menos uno de los elementos obligatorios de la Orden HAC/1177/2024. Revisa el desglose inferior para evitar incidencias ante la AEAT.</span>';
+    } else {
+        banner.className = 'res-banner res-danger';
+        banner.innerHTML = '<strong>Resultado (' + sourceLabel + '): NO CUMPLE el Reglamento VeriFactu (RD 1007/2023).</strong><br><span style="font-size:13.5px;">No se han detectado los requisitos obligatorios de la AEAT (QR tributario + huella SHA-256 encadenada). Seguir facturando así conlleva riesgo de sanción de hasta 50.000 € (Art. 201 bis LGT).</span>';
+    }
+
+    var html = '';
+    for (var i = 0; i < checks.length; i++) {
+        var c = checks[i];
+        html += '<div class="check-row">' +
+            '<span class="check-pill ' + (c.ok ? 'pill-ok' : 'pill-fail') + '">' + (c.ok ? 'CUMPLE' : 'NO CUMPLE') + '</span>' +
+            '<div><strong style="display:block; color:var(--text-main);">' + c.title + '</strong><span style="color:var(--text-body); font-size:13.5px;">' + c.desc + '</span></div>' +
+        '</div>';
+    }
+    list.innerHTML = html;
+
+    var ctaTitle = document.getElementById('ctaTitle');
+    var ctaDesc = document.getElementById('ctaDesc');
+    var ctaBtn = document.getElementById('ctaBtn');
+    if (profile === 'despacho') {
+        ctaTitle.innerText = 'Recomendación: Plan Despacho Multi-NIF (99 €/año oferta pre-1 Enero)';
+        ctaDesc.innerText = 'Gestiona NIFs, comunidades o sociedades ilimitadas con certificados y series independientes. Pruébalo 15 días gratis sin tarjeta.';
+        ctaBtn.href = 'login.html?plan=multi';
+    } else {
+        ctaTitle.innerText = 'Solución inmediata: Plan Autónomo / PYME (39 €/año oferta pre-1 Enero)';
+        ctaDesc.innerText = 'Emite tu primera factura legal con QR oficial AEAT, huella SHA-256 y tu propio logotipo en menos de 2 minutos. 15 días gratis sin tarjeta.';
+        ctaBtn.href = 'login.html?plan=single';
+    }
+
+    box.style.display = 'block';
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+</body>
+</html>
