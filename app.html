@@ -3249,6 +3249,13 @@ function refreshOnboardingChecklist() {
     var step3Done = Boolean((comp && comp.aeatCertActive) || localStorage.getItem('vf_ob_step3_done') === '1');
     var completed = (step1Done ? 1 : 0) + (step2Done ? 1 : 0) + (step3Done ? 1 : 0);
 
+    // Si ya completó los 3 pasos de la primera sesión, se oculta automáticamente para no estorbar más
+    if (completed === 3) {
+        localStorage.setItem('vf_onboarding_dismissed', '1');
+        card.style.display = 'none';
+        return;
+    }
+
     var markStep = function(dotId, done, num) {
         var dot = document.getElementById(dotId);
         if (!dot) return;
