@@ -8,6 +8,56 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "Factura-VeriFactu.es",
+          "operatingSystem": "Web, Windows, macOS, Android, iOS",
+          "applicationCategory": "BusinessApplication",
+          "url": "https://factura-verifactu.es",
+          "offers": {
+            "@type": "Offer",
+            "price": "39.00",
+            "priceCurrency": "EUR",
+            "description": "Plan Anual Autónomo (1 NIF) con 15 días de prueba gratuita"
+          },
+          "description": "Software de facturación conectado con la AEAT adaptado al reglamento VeriFactu (Real Decreto 1007/2023 y Orden HAC/1177/2024) con código QR oficial, huella SHA-256, cálculo de Modelo 303/130 y modo Multi-NIF."
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "¿Tengo que introducir mi tarjeta bancaria para probar los 15 días gratis?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. Puedes crear tu cuenta en 30 segundos y probar todos los módulos durante 15 días sin introducir tarjeta de crédito y sin compromiso."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Puedo seguir facturando con Excel o Word cuando entre en vigor el Real Decreto 1007/2023?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. El Reglamento VeriFactu (RD 1007/2023 y Orden HAC/1177/2024) prohíbe usar hojas de cálculo o procesadores de texto que permitan alterar o borrar facturas sin rastro, con sanciones de hasta 50.000 euros (Art. 201 bis LGT)."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Cómo le paso las facturas y gastos a mi gestoría al final del trimestre?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Con un solo clic en el botón Descargar Pack Trimestral para Gestoría descargas un archivo Excel con las casillas del Modelo 303 (IVA) y Modelo 130 (IRPF), libro de facturas emitidas y libro de gastos."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
     <style>
         :root {
             --bg: #ffffff;
@@ -677,7 +727,10 @@
 
                 <div style="display:flex; gap:12px; flex-wrap:wrap;">
                     <a href="login.html" class="btn btn-primary btn-lg">Empezar Prueba Gratis de 15 Días &rarr;</a>
-                    <a href="#precios" class="btn btn-outline btn-lg">Ver Oferta Pre-1 de Enero (39 €/año)</a>
+                    <button type="button" class="btn btn-outline btn-lg" onclick="openDemo60Modal()" style="border-color:var(--brand); color:var(--brand);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                        Ver cómo funciona en 60 segundos
+                    </button>
                 </div>
                 <div style="margin-top:10px; font-size:12.5px; color:var(--text-muted);">
                     Sin tarjeta de crédito para probar · Acceso inmediato a los 6 módulos en la nube
@@ -1046,10 +1099,62 @@
             <a href="verifactu-psicologos-fisioterapeutas.html" style="color:#93c5fd; text-decoration:none;">Psicólogos y Clínicas (Sin IVA)</a>
             <a href="verifactu-autonomos-irpf.html" style="color:#93c5fd; text-decoration:none;">Autónomos con Retención IRPF</a>
             <a href="verifactu-reformas-instaladores.html" style="color:#93c5fd; text-decoration:none;">Reformas e Instaladores (Móvil)</a>
+            <a href="verifactu-fontaneros-electricistas.html" style="color:#93c5fd; text-decoration:none;">Fontaneros y Electricistas</a>
+            <a href="verifactu-abogados-procuradores.html" style="color:#93c5fd; text-decoration:none;">Abogados y Procuradores</a>
+            <a href="verifactu-agentes-inmobiliarios.html" style="color:#93c5fd; text-decoration:none;">Agentes Inmobiliarios</a>
+            <a href="verifactu-disenadores-programadores-freelance.html" style="color:#93c5fd; text-decoration:none;">Freelance y Programadores</a>
+            <a href="diferencia-verifactu-y-factura-electronica-crea-y-crece.html" style="color:#93c5fd; text-decoration:none;">VeriFactu vs Ley Crea y Crece</a>
             <a href="sanciones-verifactu-excel-word.html" style="color:#93c5fd; text-decoration:none;">Sanciones Excel / Word AEAT</a>
         </div>
     </div>
 </footer>
+
+<!-- MODAL DEMO INTERACTIVA DE 60 SEGUNDOS (FASE 3.2) -->
+<div id="demo60Modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.72); z-index:200; align-items:center; justify-content:center; padding:18px;">
+    <div style="background:#ffffff; border:1px solid var(--border-strong); border-radius:14px; max-width:740px; width:100%; max-height:92vh; overflow-y:auto; box-shadow:0 24px 60px rgba(15,23,42,0.3); padding:26px 28px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:18px;">
+            <div>
+                <span class="eyebrow" style="margin-bottom:4px;">RECORRIDO RÁPIDO · 60 SEGUNDOS</span>
+                <h3 style="margin:0; font-size:20px; font-weight:800; color:var(--text-main);">Cómo funciona Factura-VeriFactu.es paso a paso</h3>
+            </div>
+            <button type="button" onclick="closeDemo60Modal()" style="background:var(--bg-subtle); border:1px solid var(--border-strong); border-radius:6px; width:34px; height:34px; font-size:20px; cursor:pointer; line-height:1;">&times;</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
+            <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:10px; padding:15px;">
+                <div style="font-size:11.5px; font-weight:700; color:var(--brand); margin-bottom:4px;">0:00 - 0:15 · PASO 1</div>
+                <strong style="display:block; font-size:14.5px; margin-bottom:5px;">Creas la factura o conviertes un presupuesto en 1 clic</strong>
+                <p style="margin:0; font-size:13px; color:var(--text-body);">Seleccionas al cliente de tu agenda habitual, indicas concepto, base e IVA/IRPF (o exento sanitario Art. 20) desde el ordenador o el móvil.</p>
+            </div>
+            <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:10px; padding:15px;">
+                <div style="font-size:11.5px; font-weight:700; color:var(--brand); margin-bottom:4px;">0:15 - 0:35 · PASO 2</div>
+                <strong style="display:block; font-size:14.5px; margin-bottom:5px;">PDF A4 con tu Logotipo, QR AEAT y Huella SHA-256</strong>
+                <p style="margin:0; font-size:13px; color:var(--text-body);">Se genera al instante el PDF oficial con el código QR verificable en la Sede Electrónica de la AEAT y encadenamiento inalterable RD 1007/2023.</p>
+            </div>
+            <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:10px; padding:15px;">
+                <div style="font-size:11.5px; font-weight:700; color:var(--brand); margin-bottom:4px;">0:35 - 0:50 · PASO 3</div>
+                <strong style="display:block; font-size:14.5px; margin-bottom:5px;">Sube foto de tus tickets y calcula el Modelo 303</strong>
+                <p style="margin:0; font-size:13px; color:var(--text-body);">Fotografía con el móvil tus facturas de luz, combustible o proveedores. El panel resta el IVA soportado y te muestra tu liquidación en tiempo real.</p>
+            </div>
+            <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:10px; padding:15px;">
+                <div style="font-size:11.5px; font-weight:700; color:var(--brand); margin-bottom:4px;">0:50 - 1:00 · PASO 4</div>
+                <strong style="display:block; font-size:14.5px; margin-bottom:5px;">Exporta el Pack Trimestral para tu Gestoría (.XLS)</strong>
+                <p style="margin:0; font-size:13px; color:var(--text-body);">Descarga en 1 clic el Excel cuadrado con las casillas oficiales del Modelo 303 y 130, libro de facturas emitidas y libro de gastos recibidos.</p>
+            </div>
+        </div>
+
+        <div style="background:var(--brand-soft); border:1px solid #bfdbfe; border-radius:10px; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+                <strong style="display:block; font-size:14.5px; color:var(--text-main);">Pruébalo tú mismo ahora con el generador de factura de ejemplo en 1 clic</strong>
+                <span style="font-size:12.5px; color:var(--text-body);">15 días gratis sin tarjeta · Garantía de reembolso de 30 días</span>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <a href="comprobador-verifactu.html" class="btn btn-outline" style="font-size:13px;">Comprobar mi PDF actual</a>
+                <a href="login.html" class="btn btn-primary" style="font-size:13px;">Entrar al Panel Gratis &rarr;</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- BOTÓN FLOTANTE DISCRETO DE CONSULTA RÁPIDA -->
 <div class="support-fab-wrap">
@@ -1074,6 +1179,14 @@
 </div>
 
 <script>
+function openDemo60Modal() {
+    var m = document.getElementById('demo60Modal');
+    if (m) m.style.display = 'flex';
+}
+function closeDemo60Modal() {
+    var m = document.getElementById('demo60Modal');
+    if (m) m.style.display = 'none';
+}
 function toggleSupportPopover() {
     var pop = document.getElementById('supportPopover');
     if (pop) pop.classList.toggle('open');
