@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requisitos Técnicos de la Orden HAC/1177/2024 (VeriFactu AEAT): QR, SHA-256 y XML</title>
+    <meta name="description" content="Resumen claro de las especificaciones técnicas de la Orden Ministerial HAC/1177/2024 de VeriFactu: formato del código QR, algoritmo SHA-256 y remisión SOAP.">
+    <link rel="canonical" href="https://factura-verifactu.es/requisitos-orden-hac-1177-2024.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Factura-VeriFactu.es cumple ya con todos los anexos de la Orden HAC/1177/2024?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Tanto el cálculo de la huella SHA-256 encadenada, como la estructura de la URL del QR con fecha DD-MM-AAAA, la leyenda VERI*FACTU y el conector SOAP para certificado .p12 están implementados conforme a la Orden HAC/1177/2024."}}, {"@type": "Question", "name": "¿Puedo comprobar cómo se ve una factura con todos estos requisitos antes de pagar?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Puedes entrar gratis durante 15 días sin tarjeta y pulsar el botón 'Ver Factura de Prueba con QR en 1 Clic' para inspeccionar el PDF A4 y escanear el código QR con tu móvil."}}]}</script>
+    <style>
+        :root {
+            --bg: #ffffff; --bg-soft: #f8fafc; --text: #0f172a; --body: #334155;
+            --muted: #64748b; --border: #e2e8f0; --border-strong: #cbd5e1;
+            --brand: #1e40af; --brand-hover: #1e3a8a; --brand-soft: #eff6ff; --success: #15803d;
+        }
+        * { box-sizing: border-box; }
+        body { margin:0; background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; font-size:15.5px; line-height:1.65; }
+        header { background:#fff; border-bottom:1px solid var(--border); padding:14px 20px; position:sticky; top:0; z-index:50; }
+        .nav { max-width:1040px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+        .brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); }
+        .brand-icon { width:32px; height:32px; border-radius:7px; background:var(--brand); color:#fff; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
+        .btn { display:inline-flex; align-items:center; justify-content:center; padding:10px 18px; border-radius:7px; font-weight:600; font-size:14px; text-decoration:none; border:1px solid transparent; }
+        .btn-primary { background:var(--brand); color:#fff; }
+        .btn-primary:hover { background:var(--brand-hover); }
+        .btn-outline { background:#fff; color:var(--text); border-color:var(--border-strong); }
+        .wrap { max-width:920px; margin:0 auto; padding:48px 20px 64px; }
+        .eyebrow { display:inline-block; font-size:11.5px; font-weight:700; color:var(--brand); background:var(--brand-soft); padding:5px 11px; border-radius:5px; margin-bottom:14px; }
+        h1 { font-size:34px; line-height:1.18; font-weight:800; letter-spacing:-0.7px; margin:0 0 16px; }
+        @media (max-width:640px) { h1 { font-size:26px; } }
+        .lead { font-size:17px; color:var(--body); margin:0 0 26px; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:28px 0; }
+        @media (max-width:740px) { .grid-2 { grid-template-columns:1fr; } }
+        .card { background:var(--bg-soft); border:1px solid var(--border); border-radius:9px; padding:20px; }
+        .card h2 { margin:0 0 8px; font-size:16px; font-weight:700; color:var(--text); }
+        .card p { margin:0; font-size:14px; color:var(--body); }
+        .cta-box { background:var(--brand-soft); border:1px solid #bfdbfe; border-radius:10px; padding:26px; margin:34px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+        .faq-item { border-bottom:1px solid var(--border); padding:16px 0; }
+        .faq-q { font-weight:700; font-size:16px; margin-bottom:6px; color:var(--text); }
+        .faq-a { margin:0; color:var(--body); font-size:14.5px; }
+        footer { background:#0f172a; color:#94a3b8; padding:32px 20px; font-size:13px; }
+        footer a { color:#93c5fd; text-decoration:none; margin-right:16px; display:inline-block; margin-bottom:6px; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="nav">
+        <a href="index.html" class="brand">
+            <div class="brand-icon">VF</div>
+            <div><strong style="font-size:15.5px;">Factura-VeriFactu.es</strong><span style="display:block;font-size:11px;color:var(--muted);">Plataforma Cloud AEAT · Kódek Sistemas</span></div>
+        </a>
+        <div style="display:flex; gap:10px;">
+            <a href="comprobador-verifactu.html" class="btn btn-outline">Comprobador Gratis</a>
+            <a href="login.html?plan=single" class="btn btn-primary">Probar 15 Días Gratis</a>
+        </div>
+    </div>
+</header>
+<main class="wrap">
+    <span class="eyebrow">ESPECIFICACIÓN TÉCNICA BOE · ORDEN MINISTERIAL HAC/1177/2024</span>
+    <h1>Requisitos Técnicos de la Orden HAC/1177/2024 de VeriFactu Explicados Paso a Paso</h1>
+    <p class="lead">La Orden HAC/1177/2024 desarrolla las especificaciones técnicas, funcionales y de formato que todo Sistema Informático de Facturación (SIF) debe cumplir para ser legal ante la Agencia Tributaria.</p>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="login.html?plan=single" class="btn btn-primary" style="padding:13px 22px; font-size:15px;">Empezar Prueba Gratis de 15 Días &rarr;</a>
+        <a href="comprobador-verifactu.html" class="btn btn-outline" style="padding:13px 20px;">Comprobar mi Factura PDF Actual (Gratis)</a>
+    </div>
+
+
+    <div style="background:#ffffff; border:1px solid var(--border-strong); border-radius:10px; padding:22px 24px; margin:28px 0; box-shadow:0 8px 24px rgba(15,23,42,0.04);">
+        <div style="font-size:11.5px; font-weight:700; color:var(--brand); text-transform:uppercase; margin-bottom:4px;">SIMULACIÓN PRÁCTICA VERIFACTU</div>
+        <h2 style="margin:0 0 10px; font-size:18px; font-weight:800; color:var(--text);">Estructura Oficial de un Registro de Alta VeriFactu (Orden HAC/1177/2024)</h2>
+        <p style="margin:0 0 14px; font-size:13.5px; color:var(--body);"><strong>Concepto:</strong> Campos técnicos obligatorios que genera Factura-VeriFactu.es en cada factura emitida</p>
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; background:var(--bg-soft); border:1px solid var(--border); border-radius:8px; padding:14px; font-size:13px;">
+            <div><span style="color:var(--muted); display:block; font-size:11.5px;">Base / Referencia</span><strong>Algoritmo de Huella: SHA-256 (Hexadecimal 64 caracteres)</strong></div>
+            <div><span style="color:var(--muted); display:block; font-size:11.5px;">Cadena de entrada del Hash</span><strong>IDEmisor + NumSerie + Fecha + Tipo + Cuota + Importe + HuellaAnterior</strong></div>
+            <div><span style="color:var(--muted); display:block; font-size:11.5px;">Tamaño y formato del Código QR (Anexo Orden)</span><strong>Entre 30x30 mm y 40x40 mm · ISO/IEC 18004 Nivel M</strong></div>
+            <div><span style="color:var(--muted); display:block; font-size:11.5px;">Total / Resultado</span><strong style="color:var(--success); font-size:14.5px;">Remisión SOAP XAdES / CSV</strong></div>
+        </div>
+        <div style="margin-top:10px; font-size:12px; color:var(--muted); font-family:monospace;">Endpoint oficial: www1.agenciatributaria.gob.es/wlpl/TIKE-CONT/SistemaFacturacion</div>
+    </div>
+    
+
+    <div class="grid-2">
+        <div class="card"><h2>1. Algoritmo de Encadenamiento Criptográfico SHA-256</h2><p>Cada registro de facturación de alta o anulación incluye una huella digital calculada con SHA-256 sobre los campos clave de la factura unidos a la huella del registro inmediatamente anterior.</p></div>
+        <div class="card"><h2>2. Especificación Gráfica y URL del Código QR</h2><p>El código QR debe precederse de la referencia 'QR tributario:', medir entre 30x30 mm y 40x40 mm, y apuntar al servicio de cotejo ValidarQR de la Sede Electrónica de la AEAT.</p></div>
+        <div class="card"><h2>3. Remisión Telemática SOAP con Certificado X.509 (.p12)</h2><p>Los sistemas VERI*FACTU remiten los registros XML firmados electrónicamente al servicio web de la AEAT, recibiendo en respuesta el Código Seguro de Verificación (CSV).</p></div>
+        <div class="card"><h2>4. Registro de Eventos e Integridad de la Cadena</h2><p>Nuestra plataforma incorpora un verificador de cadena SHA-256 en un clic para auditar en cualquier momento que el 100% de las facturas emitidas mantienen su integridad correlativa.</p></div>
+    </div>
+
+    <div class="cta-box">
+        <div>
+            <strong style="font-size:17px; color:var(--text); display:block; margin-bottom:4px;">Pruébalo 15 días gratis sin tarjeta · Garantía de 30 días</strong>
+            <span style="font-size:13.5px; color:var(--body);">Oferta de adaptación: Plan Autónomo (1 NIF) por 39 €/año y Plan Despacho Multi-NIF por 99 €/año.</span>
+        </div>
+        <a href="login.html?plan=single" class="btn btn-primary" style="padding:12px 20px;">Crear Cuenta Gratis &rarr;</a>
+    </div>
+
+    <h2 style="font-size:22px; font-weight:800; margin:36px 0 10px;">Preguntas frecuentes</h2>
+    <div class="faq-item"><div class="faq-q">¿Factura-VeriFactu.es cumple ya con todos los anexos de la Orden HAC/1177/2024?</div><p class="faq-a">Sí. Tanto el cálculo de la huella SHA-256 encadenada, como la estructura de la URL del QR con fecha DD-MM-AAAA, la leyenda VERI*FACTU y el conector SOAP para certificado .p12 están implementados conforme a la Orden HAC/1177/2024.</p></div>
+    <div class="faq-item"><div class="faq-q">¿Puedo comprobar cómo se ve una factura con todos estos requisitos antes de pagar?</div><p class="faq-a">Sí. Puedes entrar gratis durante 15 días sin tarjeta y pulsar el botón 'Ver Factura de Prueba con QR en 1 Clic' para inspeccionar el PDF A4 y escanear el código QR con tu móvil.</p></div>
+</main>
+<footer>
+    <div style="max-width:920px; margin:0 auto;">
+        <div style="margin-bottom:10px;"><strong style="color:#fff;">Factura-VeriFactu.es</strong> · Cumplimiento Real Decreto 1007/2023 y Orden HAC/1177/2024 (AEAT) · Contacto: <a href="mailto:contacto@factura-verifactu.es" style="margin:0;">contacto@factura-verifactu.es</a></div>
+        <div>
+            <a href="index.html">Inicio</a>
+            <a href="comprobador-verifactu.html">Comprobador Gratis</a>
+            <a href="verifactu-administradores-de-fincas.html">Administradores de Fincas</a>
+            <a href="verifactu-psicologos-fisioterapeutas.html">Psicólogos y Clínicas</a>
+            <a href="verifactu-autonomos-irpf.html">Autónomos IRPF</a>
+            <a href="verifactu-reformas-instaladores.html">Reformas e Instaladores</a>
+            <a href="verifactu-fontaneros-electricistas.html">Fontaneros y Electricistas</a>
+            <a href="verifactu-abogados-procuradores.html">Abogados y Procuradores</a>
+            <a href="verifactu-agentes-inmobiliarios.html">Agentes Inmobiliarios</a>
+            <a href="verifactu-disenadores-programadores-freelance.html">Freelance y Programadores</a>
+            <a href="diferencia-verifactu-y-factura-electronica-crea-y-crece.html">VeriFactu vs Crea y Crece</a>
+            <a href="multas-verifactu-autonomos.html">Multas VeriFactu</a>
+            <a href="facturar-en-excel-es-legal-espana.html">¿Es Legal Facturar en Excel?</a>
+            <a href="requisitos-orden-hac-1177-2024.html">Orden HAC/1177/2024</a>
+            <a href="sanciones-verifactu-excel-word.html">Sanciones Excel/Word</a>
+            <a href="legal.html">Aviso Legal y RGPD</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
