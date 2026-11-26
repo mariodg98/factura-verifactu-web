@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software VeriFactu para Fontaneros y Electricistas (Móvil + WhatsApp) | Factura-VeriFactu.es</title>
+    <meta name="description" content="Emite presupuestos y facturas VeriFactu con QR oficial AEAT desde el móvil o la furgoneta. Especial para fontaneros, electricistas y técnicos de climatización.">
+    <link rel="canonical" href="https://factura-verifactu.es/verifactu-fontaneros-electricistas.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Puedo hacer una factura con QR de Hacienda directamente desde el móvil en casa del cliente?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. La plataforma está diseñada para pantallas móviles: rellenas los conceptos, pulsas emitir y se genera al instante el PDF A4 con tu logotipo, huella SHA-256 y código QR oficial listo para compartir por WhatsApp."}}, {"@type": "Question", "name": "¿Qué pasa si trabajo tanto para particulares (sin retención) como para comunidades o empresas?", "acceptedAnswer": {"@type": "Answer", "text": "Puedes elegir en cada factura o presupuesto si aplicas IVA del 21%, IVA reducido del 10% o retención de IRPF cuando factures a otra empresa o administrador de fincas."}}]}</script>
+    <style>
+        :root {
+            --bg: #ffffff; --bg-soft: #f8fafc; --text: #0f172a; --body: #334155;
+            --muted: #64748b; --border: #e2e8f0; --border-strong: #cbd5e1;
+            --brand: #1e40af; --brand-hover: #1e3a8a; --brand-soft: #eff6ff; --success: #15803d;
+        }
+        * { box-sizing: border-box; }
+        body { margin:0; background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; font-size:15.5px; line-height:1.65; }
+        header { background:#fff; border-bottom:1px solid var(--border); padding:14px 20px; position:sticky; top:0; z-index:50; }
+        .nav { max-width:1040px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+        .brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); }
+        .brand-icon { width:32px; height:32px; border-radius:7px; background:var(--brand); color:#fff; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
+        .btn { display:inline-flex; align-items:center; justify-content:center; padding:10px 18px; border-radius:7px; font-weight:600; font-size:14px; text-decoration:none; border:1px solid transparent; }
+        .btn-primary { background:var(--brand); color:#fff; }
+        .btn-primary:hover { background:var(--brand-hover); }
+        .btn-outline { background:#fff; color:var(--text); border-color:var(--border-strong); }
+        .wrap { max-width:920px; margin:0 auto; padding:48px 20px 64px; }
+        .eyebrow { display:inline-block; font-size:11.5px; font-weight:700; color:var(--brand); background:var(--brand-soft); padding:5px 11px; border-radius:5px; margin-bottom:14px; }
+        h1 { font-size:34px; line-height:1.18; font-weight:800; letter-spacing:-0.7px; margin:0 0 16px; }
+        @media (max-width:640px) { h1 { font-size:26px; } }
+        .lead { font-size:17px; color:var(--body); margin:0 0 26px; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:34px 0; }
+        @media (max-width:740px) { .grid-2 { grid-template-columns:1fr; } }
+        .card { background:var(--bg-soft); border:1px solid var(--border); border-radius:9px; padding:20px; }
+        .card h2 { margin:0 0 8px; font-size:16px; font-weight:700; color:var(--text); }
+        .card p { margin:0; font-size:14px; color:var(--body); }
+        .cta-box { background:var(--brand-soft); border:1px solid #bfdbfe; border-radius:10px; padding:26px; margin:34px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+        .faq-item { border-bottom:1px solid var(--border); padding:16px 0; }
+        .faq-q { font-weight:700; font-size:16px; margin-bottom:6px; color:var(--text); }
+        .faq-a { margin:0; color:var(--body); font-size:14.5px; }
+        footer { background:#0f172a; color:#94a3b8; padding:32px 20px; font-size:13px; }
+        footer a { color:#93c5fd; text-decoration:none; margin-right:16px; display:inline-block; margin-bottom:6px; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="nav">
+        <a href="index.html" class="brand">
+            <div class="brand-icon">VF</div>
+            <div><strong style="font-size:15.5px;">Factura-VeriFactu.es</strong><span style="display:block;font-size:11px;color:var(--muted);">Plataforma Cloud AEAT · Kódek Sistemas</span></div>
+        </a>
+        <div style="display:flex; gap:10px;">
+            <a href="comprobador-verifactu.html" class="btn btn-outline">Comprobador Gratis</a>
+            <a href="login.html?plan=single" class="btn btn-primary">Probar 15 Días Gratis</a>
+        </div>
+    </div>
+</header>
+<main class="wrap">
+    <span class="eyebrow">SOLUCIÓN MÓVIL VERIFACTU PARA GREMIOS E INSTALADORES</span>
+    <h1>Facturación VeriFactu y Presupuestos desde el Móvil para Fontaneros y Electricistas</h1>
+    <p class="lead">Haz un presupuesto desglosado desde la furgoneta en 30 segundos, envíaselo al cliente por WhatsApp y conviértelo en factura oficial VeriFactu con código QR de Hacienda en un solo clic.</p>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="login.html?plan=single" class="btn btn-primary" style="padding:13px 22px; font-size:15px;">Empezar Prueba Gratis de 15 Días &rarr;</a>
+        <a href="comprobador-verifactu.html" class="btn btn-outline" style="padding:13px 20px;">Comprobar mi Factura PDF Actual (Gratis)</a>
+    </div>
+
+    <div class="grid-2">
+        <div class="card"><h2>Presupuesto a Factura en 1 Clic</h2><p>Crea el presupuesto con materiales y mano de obra delante del cliente. En cuanto lo acepte, conviértelo en factura oficial VeriFactu sin volver a escribir nada.</p></div>
+        <div class="card"><h2>IVA General (21%) e IVA Reducido de Rehabilitación (10%)</h2><p>Cambia en un clic entre el 21% estándar y el 10% aplicable a obras de reparación y fontanería en viviendas particulares.</p></div>
+        <div class="card"><h2>Foto a Tickets de Gasoil y Materiales</h2><p>Fotografía con el móvil las facturas de tus almacenes eléctricos o de fontanería y el combustible para calcular tu Modelo 303 automáticamente.</p></div>
+        <div class="card"><h2>Sin Instalar Nada (Funciona en Móvil y PC)</h2><p>Entra desde tu teléfono Android o iPhone a pie de obra o desde el ordenador de casa, con tu logotipo impreso en el PDF A4.</p></div>
+    </div>
+
+    <div class="cta-box">
+        <div>
+            <strong style="font-size:17px; color:var(--text); display:block; margin-bottom:4px;">Pruébalo 15 días gratis sin tarjeta · Garantía de 30 días</strong>
+            <span style="font-size:13.5px; color:var(--body);">Oferta de adaptación: Plan Autónomo (1 NIF) por 39 €/año y Plan Despacho Multi-NIF por 99 €/año.</span>
+        </div>
+        <a href="login.html?plan=single" class="btn btn-primary" style="padding:12px 20px;">Crear Cuenta Gratis &rarr;</a>
+    </div>
+
+    <h2 style="font-size:22px; font-weight:800; margin:36px 0 10px;">Preguntas frecuentes</h2>
+    <div class="faq-item"><div class="faq-q">¿Puedo hacer una factura con QR de Hacienda directamente desde el móvil en casa del cliente?</div><p class="faq-a">Sí. La plataforma está diseñada para pantallas móviles: rellenas los conceptos, pulsas emitir y se genera al instante el PDF A4 con tu logotipo, huella SHA-256 y código QR oficial listo para compartir por WhatsApp.</p></div>
+    <div class="faq-item"><div class="faq-q">¿Qué pasa si trabajo tanto para particulares (sin retención) como para comunidades o empresas?</div><p class="faq-a">Puedes elegir en cada factura o presupuesto si aplicas IVA del 21%, IVA reducido del 10% o retención de IRPF cuando factures a otra empresa o administrador de fincas.</p></div>
+</main>
+<footer>
+    <div style="max-width:920px; margin:0 auto;">
+        <div style="margin-bottom:10px;"><strong style="color:#fff;">Factura-VeriFactu.es</strong> · Cumplimiento Real Decreto 1007/2023 y Orden HAC/1177/2024 (AEAT) · Contacto: <a href="mailto:contacto@factura-verifactu.es" style="margin:0;">contacto@factura-verifactu.es</a></div>
+        <div>
+            <a href="index.html">Inicio</a>
+            <a href="comprobador-verifactu.html">Comprobador Gratis</a>
+            <a href="verifactu-administradores-de-fincas.html">Administradores de Fincas</a>
+            <a href="verifactu-psicologos-fisioterapeutas.html">Psicólogos y Clínicas</a>
+            <a href="verifactu-autonomos-irpf.html">Autónomos IRPF</a>
+            <a href="verifactu-reformas-instaladores.html">Reformas e Instaladores</a>
+            <a href="verifactu-fontaneros-electricistas.html">Fontaneros y Electricistas</a>
+            <a href="verifactu-abogados-procuradores.html">Abogados y Procuradores</a>
+            <a href="verifactu-agentes-inmobiliarios.html">Agentes Inmobiliarios</a>
+            <a href="verifactu-disenadores-programadores-freelance.html">Freelance y Programadores</a>
+            <a href="diferencia-verifactu-y-factura-electronica-crea-y-crece.html">VeriFactu vs Crea y Crece</a>
+            <a href="sanciones-verifactu-excel-word.html">Sanciones Excel/Word</a>
+            <a href="legal.html">Aviso Legal y RGPD</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
